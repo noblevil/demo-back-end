@@ -1,0 +1,368 @@
+2020-06-10 10:17:04,989 INFO [main] c.a.c.n.c.NacosPropertySourceBuilder [NacosPropertySourceBuilder.java : 91] Loading nacos data, dataId: 'blade.yaml', group: 'DEFAULT_GROUP', data: 
+server:
+  undertow:
+
+    io-threads: 16
+
+    worker-threads: 400
+
+    buffer-size: 1024
+
+    direct-buffers: true
+
+
+spring:
+  cloud:
+    sentinel:
+      eager: true
+  devtools:
+    restart:
+      log-condition-evaluation-delta: false
+    livereload:
+      port: 23333
+
+
+feign:
+  hystrix:
+    enabled: true
+  okhttp:
+    enabled: true
+  httpclient:
+    enabled: false
+
+
+hystrix:
+  threadpool:
+    default:
+      coreSize: 300
+      maxQueueSize: 1000
+      queueSizeRejectionThreshold: 800
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 5000
+
+
+ribbon:
+
+  MaxAutoRetries: 1
+
+  MaxAutoRetriesNextServer: 2
+
+  ReadTimeout: 60000
+
+  ConnectTimeout: 60000
+
+  OkToRetryOnAllOperations: true
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+
+
+blade:
+  xss:
+    enabled: true
+    skip-url:
+      - /weixin
+      - /notice/submit
+  secure:
+    skip-url:
+      - /test/**
+    client:
+      - client-id: sword
+        path-patterns:
+          - /sword/**
+      - client-id: saber
+        path-patterns:
+          - /saber/**
+  tenant:
+    enhance: true
+    column: tenant_id
+    exclude-tables:
+      - blade_user
+
+2020-06-10 10:17:05,004 INFO [main] c.a.c.n.c.NacosPropertySourceBuilder [NacosPropertySourceBuilder.java : 91] Loading nacos data, dataId: 'blade-dev.yaml', group: 'DEFAULT_GROUP', data: 
+spring:
+  redis:
+
+    host: 127.0.0.1
+    port: 6379
+    password:
+    database: 0
+    ssl: false
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+    druid:
+
+      validation-query: select 1
+
+
+blade:
+
+  lock:
+    enabled: false
+    address: redis://127.0.0.1:6379
+
+  datasource:
+    dev:
+
+      url: jdbc:mysql://localhost:3306/bladex?useSSL=false&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&transformedBitIsBoolean=true&tinyInt1isBit=false&allowMultiQueries=true&serverTimezone=GMT%2B8&allowPublicKeyRetrieval=true
+      username: root
+      password: 123456
+
+  document:
+    resources:
+      - name: 授权模块
+        location: /blade-auth
+      - name: 工作台模块
+        location: /blade-desk
+      - name: 系统模块
+        location: /blade-system
+
+2020-06-10 10:17:05,011 WARN [main] c.a.c.n.c.NacosPropertySourceBuilder [NacosPropertySourceBuilder.java : 86] Ignore the empty nacos configuration and get it based on dataId[blade-xxljob-admin] & group[DEFAULT_GROUP]
+2020-06-10 10:17:05,016 WARN [main] c.a.c.n.c.NacosPropertySourceBuilder [NacosPropertySourceBuilder.java : 86] Ignore the empty nacos configuration and get it based on dataId[blade-xxljob-admin.yaml] & group[DEFAULT_GROUP]
+2020-06-10 10:17:05,020 WARN [main] c.a.c.n.c.NacosPropertySourceBuilder [NacosPropertySourceBuilder.java : 86] Ignore the empty nacos configuration and get it based on dataId[blade-xxljob-admin-dev.yaml] & group[DEFAULT_GROUP]
+2020-06-10 10:17:05,021 INFO [main] o.s.c.b.c.PropertySourceBootstrapConfiguration [PropertySourceBootstrapConfiguration.java : 109] Located property source: [BootstrapPropertySource {name='bootstrapProperties-blade-xxljob-admin-dev.yaml'}, BootstrapPropertySource {name='bootstrapProperties-blade-xxljob-admin.yaml'}, BootstrapPropertySource {name='bootstrapProperties-blade-xxljob-admin'}, BootstrapPropertySource {name='bootstrapProperties-blade-dev.yaml'}, BootstrapPropertySource {name='bootstrapProperties-blade.yaml'}]
+2020-06-10 10:17:05,025 INFO [main] c.xxl.job.admin.JobAdminApplication [SpringApplication.java : 652] The following profiles are active: dev
+2020-06-10 10:17:05,407 WARN [main] o.s.b.w.s.c.AnnotationConfigServletWebServerApplicationContext [AbstractApplicationContext.java : 557] Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.BeanDefinitionStoreException: Failed to process import candidates for configuration class [com.xxl.job.admin.JobAdminApplication]; nested exception is java.lang.IllegalStateException: Error processing condition on org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration$EmbeddedDatabaseConfiguration
+2020-06-10 10:17:05,413 INFO [main] o.s.b.a.l.ConditionEvaluationReportLoggingListener [ConditionEvaluationReportLoggingListener.java : 136] 
+
+Error starting ApplicationContext. To display the conditions report re-run your application with 'debug' enabled.
+2020-06-10 10:17:05,427 ERROR [main] o.s.boot.SpringApplication [SpringApplication.java : 823] Application run failed
+org.springframework.beans.factory.BeanDefinitionStoreException: Failed to process import candidates for configuration class [com.xxl.job.admin.JobAdminApplication]; nested exception is java.lang.IllegalStateException: Error processing condition on org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration$EmbeddedDatabaseConfiguration
+	at org.springframework.context.annotation.ConfigurationClassParser.processImports(ConfigurationClassParser.java:596)
+	at org.springframework.context.annotation.ConfigurationClassParser.access$900(ConfigurationClassParser.java:108)
+	at org.springframework.context.annotation.ConfigurationClassParser$DeferredImportSelectorGroupingHandler.lambda$processGroupImports$1(ConfigurationClassParser.java:801)
+	at java.util.ArrayList.forEach(ArrayList.java:1257)
+	at org.springframework.context.annotation.ConfigurationClassParser$DeferredImportSelectorGroupingHandler.processGroupImports(ConfigurationClassParser.java:798)
+	at org.springframework.context.annotation.ConfigurationClassParser$DeferredImportSelectorHandler.process(ConfigurationClassParser.java:770)
+	at org.springframework.context.annotation.ConfigurationClassParser.parse(ConfigurationClassParser.java:185)
+	at org.springframework.context.annotation.ConfigurationClassPostProcessor.processConfigBeanDefinitions(ConfigurationClassPostProcessor.java:315)
+	at org.springframework.context.annotation.ConfigurationClassPostProcessor.postProcessBeanDefinitionRegistry(ConfigurationClassPostProcessor.java:232)
+	at org.springframework.context.support.PostProcessorRegistrationDelegate.invokeBeanDefinitionRegistryPostProcessors(PostProcessorRegistrationDelegate.java:275)
+	at org.springframework.context.support.PostProcessorRegistrationDelegate.invokeBeanFactoryPostProcessors(PostProcessorRegistrationDelegate.java:95)
+	at org.springframework.context.support.AbstractApplicationContext.invokeBeanFactoryPostProcessors(AbstractApplicationContext.java:705)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:531)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:141)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:744)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:391)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:312)
+	at org.springframework.boot.builder.SpringApplicationBuilder.run(SpringApplicationBuilder.java:140)
+	at org.springblade.core.launch.BladeApplication.run(BladeApplication.java:49)
+	at com.xxl.job.admin.JobAdminApplication.main(JobAdminApplication.java:14)
+Caused by: java.lang.IllegalStateException: Error processing condition on org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration$EmbeddedDatabaseConfiguration
+	at org.springframework.boot.autoconfigure.condition.SpringBootCondition.matches(SpringBootCondition.java:60)
+	at org.springframework.context.annotation.ConditionEvaluator.shouldSkip(ConditionEvaluator.java:108)
+	at org.springframework.context.annotation.ConfigurationClassParser.processConfigurationClass(ConfigurationClassParser.java:218)
+	at org.springframework.context.annotation.ConfigurationClassParser.processMemberClasses(ConfigurationClassParser.java:361)
+	at org.springframework.context.annotation.ConfigurationClassParser.doProcessConfigurationClass(ConfigurationClassParser.java:263)
+	at org.springframework.context.annotation.ConfigurationClassParser.processConfigurationClass(ConfigurationClassParser.java:242)
+	at org.springframework.context.annotation.ConfigurationClassParser.processImports(ConfigurationClassParser.java:586)
+	... 19 common frames omitted
+Caused by: java.lang.IllegalArgumentException: Could not resolve placeholder 'blade.datasource.job.dev.url' in value "${blade.datasource.job.dev.url}"
+	at org.springframework.util.PropertyPlaceholderHelper.parseStringValue(PropertyPlaceholderHelper.java:178)
+	at org.springframework.util.PropertyPlaceholderHelper.replacePlaceholders(PropertyPlaceholderHelper.java:124)
+	at org.springframework.core.env.AbstractPropertyResolver.doResolvePlaceholders(AbstractPropertyResolver.java:237)
+	at org.springframework.core.env.AbstractPropertyResolver.resolveRequiredPlaceholders(AbstractPropertyResolver.java:211)
+	at org.springframework.core.env.AbstractPropertyResolver.resolveNestedPlaceholders(AbstractPropertyResolver.java:228)
+	at org.springframework.core.env.PropertySourcesPropertyResolver.getProperty(PropertySourcesPropertyResolver.java:88)
+	at org.springframework.core.env.PropertySourcesPropertyResolver.getProperty(PropertySourcesPropertyResolver.java:62)
+	at org.springframework.core.env.AbstractEnvironment.getProperty(AbstractEnvironment.java:539)
+	at org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration$EmbeddedDatabaseCondition.getMatchOutcome(DataSourceAutoConfiguration.java:137)
+	at org.springframework.boot.autoconfigure.condition.SpringBootCondition.matches(SpringBootCondition.java:47)
+	... 25 common frames omitted
+2020-06-10 10:22:52,588 INFO [main] c.a.c.n.c.NacosPropertySourceBuilder [NacosPropertySourceBuilder.java : 91] Loading nacos data, dataId: 'blade.yaml', group: 'DEFAULT_GROUP', data: 
+server:
+  undertow:
+
+    io-threads: 16
+
+    worker-threads: 400
+
+    buffer-size: 1024
+
+    direct-buffers: true
+
+
+spring:
+  cloud:
+    sentinel:
+      eager: true
+  devtools:
+    restart:
+      log-condition-evaluation-delta: false
+    livereload:
+      port: 23333
+
+
+feign:
+  hystrix:
+    enabled: true
+  okhttp:
+    enabled: true
+  httpclient:
+    enabled: false
+
+
+hystrix:
+  threadpool:
+    default:
+      coreSize: 300
+      maxQueueSize: 1000
+      queueSizeRejectionThreshold: 800
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 5000
+
+
+ribbon:
+
+  MaxAutoRetries: 1
+
+  MaxAutoRetriesNextServer: 2
+
+  ReadTimeout: 60000
+
+  ConnectTimeout: 60000
+
+  OkToRetryOnAllOperations: true
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+
+
+blade:
+  xss:
+    enabled: true
+    skip-url:
+      - /weixin
+      - /notice/submit
+  secure:
+    skip-url:
+      - /test/**
+    client:
+      - client-id: sword
+        path-patterns:
+          - /sword/**
+      - client-id: saber
+        path-patterns:
+          - /saber/**
+  tenant:
+    enhance: true
+    column: tenant_id
+    exclude-tables:
+      - blade_user
+
+2020-06-10 10:22:52,599 INFO [main] c.a.c.n.c.NacosPropertySourceBuilder [NacosPropertySourceBuilder.java : 91] Loading nacos data, dataId: 'blade-dev.yaml', group: 'DEFAULT_GROUP', data: 
+spring:
+  redis:
+
+    host: 127.0.0.1
+    port: 6379
+    password:
+    database: 0
+    ssl: false
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+    druid:
+
+      validation-query: select 1
+
+
+blade:
+
+  lock:
+    enabled: false
+    address: redis://127.0.0.1:6379
+
+  datasource:
+    dev:
+
+      url: jdbc:mysql://localhost:3306/bladex?useSSL=false&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&transformedBitIsBoolean=true&tinyInt1isBit=false&allowMultiQueries=true&serverTimezone=GMT%2B8&allowPublicKeyRetrieval=true
+      username: root
+      password: 123456
+
+  document:
+    resources:
+      - name: 授权模块
+        location: /blade-auth
+      - name: 工作台模块
+        location: /blade-desk
+      - name: 系统模块
+        location: /blade-system
+
+2020-06-10 10:22:52,606 WARN [main] c.a.c.n.c.NacosPropertySourceBuilder [NacosPropertySourceBuilder.java : 86] Ignore the empty nacos configuration and get it based on dataId[blade-xxljob-admin] & group[DEFAULT_GROUP]
+2020-06-10 10:22:52,608 WARN [main] c.a.c.n.c.NacosPropertySourceBuilder [NacosPropertySourceBuilder.java : 86] Ignore the empty nacos configuration and get it based on dataId[blade-xxljob-admin.yaml] & group[DEFAULT_GROUP]
+2020-06-10 10:22:52,611 WARN [main] c.a.c.n.c.NacosPropertySourceBuilder [NacosPropertySourceBuilder.java : 86] Ignore the empty nacos configuration and get it based on dataId[blade-xxljob-admin-dev.yaml] & group[DEFAULT_GROUP]
+2020-06-10 10:22:52,612 INFO [main] o.s.c.b.c.PropertySourceBootstrapConfiguration [PropertySourceBootstrapConfiguration.java : 109] Located property source: [BootstrapPropertySource {name='bootstrapProperties-blade-xxljob-admin-dev.yaml'}, BootstrapPropertySource {name='bootstrapProperties-blade-xxljob-admin.yaml'}, BootstrapPropertySource {name='bootstrapProperties-blade-xxljob-admin'}, BootstrapPropertySource {name='bootstrapProperties-blade-dev.yaml'}, BootstrapPropertySource {name='bootstrapProperties-blade.yaml'}]
+2020-06-10 10:22:52,615 INFO [main] c.xxl.job.admin.JobAdminApplication [SpringApplication.java : 652] The following profiles are active: dev
+2020-06-10 10:22:52,955 WARN [main] o.s.b.w.s.c.AnnotationConfigServletWebServerApplicationContext [AbstractApplicationContext.java : 557] Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.BeanDefinitionStoreException: Failed to process import candidates for configuration class [com.xxl.job.admin.JobAdminApplication]; nested exception is java.lang.IllegalStateException: Error processing condition on org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration$EmbeddedDatabaseConfiguration
+2020-06-10 10:22:52,960 INFO [main] o.s.b.a.l.ConditionEvaluationReportLoggingListener [ConditionEvaluationReportLoggingListener.java : 136] 
+
+Error starting ApplicationContext. To display the conditions report re-run your application with 'debug' enabled.
+2020-06-10 10:22:52,974 ERROR [main] o.s.boot.SpringApplication [SpringApplication.java : 823] Application run failed
+org.springframework.beans.factory.BeanDefinitionStoreException: Failed to process import candidates for configuration class [com.xxl.job.admin.JobAdminApplication]; nested exception is java.lang.IllegalStateException: Error processing condition on org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration$EmbeddedDatabaseConfiguration
+	at org.springframework.context.annotation.ConfigurationClassParser.processImports(ConfigurationClassParser.java:596)
+	at org.springframework.context.annotation.ConfigurationClassParser.access$900(ConfigurationClassParser.java:108)
+	at org.springframework.context.annotation.ConfigurationClassParser$DeferredImportSelectorGroupingHandler.lambda$processGroupImports$1(ConfigurationClassParser.java:801)
+	at java.util.ArrayList.forEach(ArrayList.java:1257)
+	at org.springframework.context.annotation.ConfigurationClassParser$DeferredImportSelectorGroupingHandler.processGroupImports(ConfigurationClassParser.java:798)
+	at org.springframework.context.annotation.ConfigurationClassParser$DeferredImportSelectorHandler.process(ConfigurationClassParser.java:770)
+	at org.springframework.context.annotation.ConfigurationClassParser.parse(ConfigurationClassParser.java:185)
+	at org.springframework.context.annotation.ConfigurationClassPostProcessor.processConfigBeanDefinitions(ConfigurationClassPostProcessor.java:315)
+	at org.springframework.context.annotation.ConfigurationClassPostProcessor.postProcessBeanDefinitionRegistry(ConfigurationClassPostProcessor.java:232)
+	at org.springframework.context.support.PostProcessorRegistrationDelegate.invokeBeanDefinitionRegistryPostProcessors(PostProcessorRegistrationDelegate.java:275)
+	at org.springframework.context.support.PostProcessorRegistrationDelegate.invokeBeanFactoryPostProcessors(PostProcessorRegistrationDelegate.java:95)
+	at org.springframework.context.support.AbstractApplicationContext.invokeBeanFactoryPostProcessors(AbstractApplicationContext.java:705)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:531)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:141)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:744)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:391)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:312)
+	at org.springframework.boot.builder.SpringApplicationBuilder.run(SpringApplicationBuilder.java:140)
+	at org.springblade.core.launch.BladeApplication.run(BladeApplication.java:49)
+	at com.xxl.job.admin.JobAdminApplication.main(JobAdminApplication.java:14)
+Caused by: java.lang.IllegalStateException: Error processing condition on org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration$EmbeddedDatabaseConfiguration
+	at org.springframework.boot.autoconfigure.condition.SpringBootCondition.matches(SpringBootCondition.java:60)
+	at org.springframework.context.annotation.ConditionEvaluator.shouldSkip(ConditionEvaluator.java:108)
+	at org.springframework.context.annotation.ConfigurationClassParser.processConfigurationClass(ConfigurationClassParser.java:218)
+	at org.springframework.context.annotation.ConfigurationClassParser.processMemberClasses(ConfigurationClassParser.java:361)
+	at org.springframework.context.annotation.ConfigurationClassParser.doProcessConfigurationClass(ConfigurationClassParser.java:263)
+	at org.springframework.context.annotation.ConfigurationClassParser.processConfigurationClass(ConfigurationClassParser.java:242)
+	at org.springframework.context.annotation.ConfigurationClassParser.processImports(ConfigurationClassParser.java:586)
+	... 19 common frames omitted
+Caused by: java.lang.IllegalArgumentException: Could not resolve placeholder 'blade.datasource.job.dev.url' in value "${blade.datasource.job.dev.url}"
+	at org.springframework.util.PropertyPlaceholderHelper.parseStringValue(PropertyPlaceholderHelper.java:178)
+	at org.springframework.util.PropertyPlaceholderHelper.replacePlaceholders(PropertyPlaceholderHelper.java:124)
+	at org.springframework.core.env.AbstractPropertyResolver.doResolvePlaceholders(AbstractPropertyResolver.java:237)
+	at org.springframework.core.env.AbstractPropertyResolver.resolveRequiredPlaceholders(AbstractPropertyResolver.java:211)
+	at org.springframework.core.env.AbstractPropertyResolver.resolveNestedPlaceholders(AbstractPropertyResolver.java:228)
+	at org.springframework.core.env.PropertySourcesPropertyResolver.getProperty(PropertySourcesPropertyResolver.java:88)
+	at org.springframework.core.env.PropertySourcesPropertyResolver.getProperty(PropertySourcesPropertyResolver.java:62)
+	at org.springframework.core.env.AbstractEnvironment.getProperty(AbstractEnvironment.java:539)
+	at org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration$EmbeddedDatabaseCondition.getMatchOutcome(DataSourceAutoConfiguration.java:137)
+	at org.springframework.boot.autoconfigure.condition.SpringBootCondition.matches(SpringBootCondition.java:47)
+	... 25 common frames omitted

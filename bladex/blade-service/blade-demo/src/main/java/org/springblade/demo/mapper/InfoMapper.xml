@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.springblade.demo.mapper.InfoMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="infoResultMap" type="org.springblade.demo.entity.Info">
+        <id column="Org_Id" property="orgId"/>
+        <result column="Org_Name" property="orgName"/>
+        <result column="Org_Simply_Name" property="orgSimplyName"/>
+        <result column="Org_Register_Add" property="orgRegisterAdd"/>
+        <result column="Org_Often_Add" property="orgOftenAdd"/>
+        <result column="Is_Invest_Abroad" property="isInvestAbroad"/>
+        <result column="Org_Phone_Num" property="orgPhoneNum"/>
+        <result column="Often_User_Fri" property="oftenUserFri"/>
+        <result column="Often_User_Fri_Num" property="oftenUserFriNum"/>
+        <result column="Often_User_Sec" property="oftenUserSec"/>
+        <result column="Often_User_Sec_Num" property="oftenUserSecNum"/>
+        <result column="Unified_Code" property="unifiedCode"/>
+        <result column="Org_Business_License" property="orgBusinessLicense"/>
+        <result column="Related_Certificates" property="relatedCertificates"/>
+        <result column="School_Licence_Num" property="schoolLicenceNum"/>
+        <result column="Lience_Department" property="lienceDepartment"/>
+        <result column="List_Type" property="listType"/>
+        <result column="Org_Region" property="orgRegion"/>
+        <result column="Train_Level" property="trainLevel"/>
+        <result column="Train_Subject" property="trainSubject"/>
+        <result column="Train_Form" property="trainForm"/>
+    </resultMap>
+
+
+    <select id="selectInfoPage" resultMap="infoResultMap">
+        select * from org_info where is_deleted = 0
+    </select>
+
+</mapper>

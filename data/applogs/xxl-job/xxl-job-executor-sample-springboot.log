@@ -1,0 +1,237 @@
+2020-07-02 20:41:22,401 INFO [main] c.a.c.n.c.NacosPropertySourceBuilder [NacosPropertySourceBuilder.java : 91] Loading nacos data, dataId: 'blade.yaml', group: 'DEFAULT_GROUP', data: 
+server:
+  undertow:
+
+    io-threads: 16
+
+    worker-threads: 400
+
+    buffer-size: 1024
+
+    direct-buffers: true
+
+
+spring:
+  cloud:
+    sentinel:
+      eager: true
+  devtools:
+    restart:
+      log-condition-evaluation-delta: false
+    livereload:
+      port: 23333
+
+
+feign:
+  hystrix:
+    enabled: true
+  okhttp:
+    enabled: true
+  httpclient:
+    enabled: false
+
+
+hystrix:
+  threadpool:
+    default:
+      coreSize: 300
+      maxQueueSize: 1000
+      queueSizeRejectionThreshold: 800
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 5000
+
+
+ribbon:
+
+  MaxAutoRetries: 1
+
+  MaxAutoRetriesNextServer: 2
+
+  ReadTimeout: 60000
+
+  ConnectTimeout: 60000
+
+  OkToRetryOnAllOperations: true
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+
+
+blade:
+  xss:
+    enabled: true
+    skip-url:
+      - /weixin
+      - /notice/submit
+      - /blog/list
+  secure:
+    skip-url:
+      - /test/**
+    client:
+      - client-id: sword
+        path-patterns:
+          - /sword/**
+      - client-id: saber
+        path-patterns:
+          - /saber/**
+  tenant:
+    enhance: true
+    column: tenant_id
+    exclude-tables:
+      - blade_user
+
+2020-07-02 20:41:22,426 INFO [main] c.a.c.n.c.NacosPropertySourceBuilder [NacosPropertySourceBuilder.java : 91] Loading nacos data, dataId: 'blade-dev.yaml', group: 'DEFAULT_GROUP', data: 
+spring:
+  redis:
+
+    host: 127.0.0.1
+    port: 6379
+    password:
+    database: 0
+    ssl: false
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+    druid:
+
+      validation-query: select 1
+
+
+blade:
+
+  lock:
+    enabled: false
+    address: redis://127.0.0.1:6379
+
+  datasource:
+    dev:
+
+      url: jdbc:mysql://localhost:3306/bladex?useSSL=false&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&transformedBitIsBoolean=true&tinyInt1isBit=false&allowMultiQueries=true&serverTimezone=GMT%2B8&allowPublicKeyRetrieval=true
+      username: root
+      password: 123456
+
+  document:
+    resources:
+      - name: 授权模块
+        location: /blade-auth
+      - name: 工作台模块
+        location: /blade-desk
+      - name: 系统模块
+        location: /blade-system
+
+2020-07-02 20:41:22,434 WARN [main] c.a.c.n.c.NacosPropertySourceBuilder [NacosPropertySourceBuilder.java : 86] Ignore the empty nacos configuration and get it based on dataId[blade-xxljob] & group[DEFAULT_GROUP]
+2020-07-02 20:41:22,438 WARN [main] c.a.c.n.c.NacosPropertySourceBuilder [NacosPropertySourceBuilder.java : 86] Ignore the empty nacos configuration and get it based on dataId[blade-xxljob.yaml] & group[DEFAULT_GROUP]
+2020-07-02 20:41:22,441 WARN [main] c.a.c.n.c.NacosPropertySourceBuilder [NacosPropertySourceBuilder.java : 86] Ignore the empty nacos configuration and get it based on dataId[blade-xxljob-dev.yaml] & group[DEFAULT_GROUP]
+2020-07-02 20:41:22,443 INFO [main] o.s.c.b.c.PropertySourceBootstrapConfiguration [PropertySourceBootstrapConfiguration.java : 109] Located property source: [BootstrapPropertySource {name='bootstrapProperties-blade-xxljob-dev.yaml'}, BootstrapPropertySource {name='bootstrapProperties-blade-xxljob.yaml'}, BootstrapPropertySource {name='bootstrapProperties-blade-xxljob'}, BootstrapPropertySource {name='bootstrapProperties-blade-dev.yaml'}, BootstrapPropertySource {name='bootstrapProperties-blade.yaml'}]
+2020-07-02 20:41:22,465 INFO [main] o.s.job.executor.JobApplication [SpringApplication.java : 652] The following profiles are active: dev
+2020-07-02 20:41:22,589 WARN [main] o.s.c.c.u.SpringFactoryImportSelector [SpringFactoryImportSelector.java : 84] More than one implementation of @EnableCircuitBreaker (now relying on @Conditionals to pick one): [org.springframework.cloud.netflix.hystrix.HystrixCircuitBreakerConfiguration, com.alibaba.cloud.sentinel.custom.SentinelCircuitBreakerConfiguration]
+2020-07-02 20:41:23,410 WARN [main] o.s.boot.actuate.endpoint.EndpointId [EndpointId.java : 131] Endpoint ID 'nacos-config' contains invalid characters, please migrate to a valid format.
+2020-07-02 20:41:23,414 WARN [main] o.s.boot.actuate.endpoint.EndpointId [EndpointId.java : 131] Endpoint ID 'nacos-discovery' contains invalid characters, please migrate to a valid format.
+2020-07-02 20:41:23,806 WARN [main] o.s.boot.actuate.endpoint.EndpointId [EndpointId.java : 131] Endpoint ID 'service-registry' contains invalid characters, please migrate to a valid format.
+2020-07-02 20:41:23,831 WARN [main] o.s.boot.actuate.endpoint.EndpointId [EndpointId.java : 131] Endpoint ID 'hystrix.stream' contains invalid characters, please migrate to a valid format.
+2020-07-02 20:41:24,091 INFO [main] o.s.cloud.context.scope.GenericScope [GenericScope.java : 295] BeanFactory id=7b17e4a8-db10-3eb5-af08-74e500632936
+2020-07-02 20:41:24,095 INFO [main] o.s.c.a.ConfigurationClassEnhancer [ConfigurationClassEnhancer.java : 355] @Bean method BladePropertyConfiguration.bladePropertySourcePostProcessor is non-static and returns an object assignable to Spring's BeanFactoryPostProcessor interface. This will result in a failure to process annotations such as @Autowired, @Resource and @PostConstruct within the method's declaring @Configuration class. Add the 'static' modifier to this method to avoid these container lifecycle issues; see @Bean javadoc for complete details.
+2020-07-02 20:41:24,098 INFO [main] o.s.c.l.p.BladePropertySourcePostProcessor [BladePropertySourcePostProcessor.java : 150] BladePropertySourcePostProcessor init.
+2020-07-02 20:41:24,099 INFO [main] o.s.c.l.p.BladePropertySourcePostProcessor [BladePropertySourcePostProcessor.java : 62] BladePropertySourcePostProcessor process @BladePropertySource bean.
+2020-07-02 20:41:24,132 WARN [main] o.s.c.l.p.BladePropertySourcePostProcessor [BladePropertySourcePostProcessor.java : 67] Not found @BladePropertySource on spring bean class.
+2020-07-02 20:41:24,140 INFO [main] o.s.i.c.DefaultConfiguringBeanFactoryPostProcessor [DefaultConfiguringBeanFactoryPostProcessor.java : 193] No bean named 'errorChannel' has been explicitly defined. Therefore, a default PublishSubscribeChannel will be created.
+2020-07-02 20:41:24,149 INFO [main] o.s.i.c.DefaultConfiguringBeanFactoryPostProcessor [DefaultConfiguringBeanFactoryPostProcessor.java : 280] No bean named 'taskScheduler' has been explicitly defined. Therefore, a default ThreadPoolTaskScheduler will be created.
+2020-07-02 20:41:24,157 INFO [main] o.s.i.c.DefaultConfiguringBeanFactoryPostProcessor [DefaultConfiguringBeanFactoryPostProcessor.java : 431] No bean named 'integrationHeaderChannelRegistry' has been explicitly defined. Therefore, a default DefaultHeaderChannelRegistry will be created.
+2020-07-02 20:41:24,410 INFO [main] o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker [PostProcessorRegistrationDelegate.java : 330] Bean 'spring.cloud.sentinel-com.alibaba.cloud.sentinel.SentinelProperties' of type [com.alibaba.cloud.sentinel.SentinelProperties] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2020-07-02 20:41:24,839 INFO [main] o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker [PostProcessorRegistrationDelegate.java : 330] Bean 'com.alibaba.cloud.sentinel.custom.SentinelAutoConfiguration' of type [com.alibaba.cloud.sentinel.custom.SentinelAutoConfiguration$$EnhancerBySpringCGLIB$$a186c343] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2020-07-02 20:41:24,848 INFO [main] o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker [PostProcessorRegistrationDelegate.java : 330] Bean 'org.springframework.integration.config.IntegrationManagementConfiguration' of type [org.springframework.integration.config.IntegrationManagementConfiguration$$EnhancerBySpringCGLIB$$e8d11095] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2020-07-02 20:41:24,859 INFO [main] o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker [PostProcessorRegistrationDelegate.java : 330] Bean 'org.springframework.boot.autoconfigure.integration.IntegrationAutoConfiguration$IntegrationJmxConfiguration' of type [org.springframework.boot.autoconfigure.integration.IntegrationAutoConfiguration$IntegrationJmxConfiguration$$EnhancerBySpringCGLIB$$c4631bb5] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2020-07-02 20:41:24,870 INFO [main] o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker [PostProcessorRegistrationDelegate.java : 330] Bean 'org.springframework.boot.autoconfigure.jmx.JmxAutoConfiguration' of type [org.springframework.boot.autoconfigure.jmx.JmxAutoConfiguration$$EnhancerBySpringCGLIB$$fd4ac482] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2020-07-02 20:41:24,876 INFO [main] o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker [PostProcessorRegistrationDelegate.java : 330] Bean 'mbeanServer' of type [com.sun.jmx.mbeanserver.JmxMBeanServer] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2020-07-02 20:41:24,905 INFO [main] o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker [PostProcessorRegistrationDelegate.java : 330] Bean 'integrationDisposableAutoCreatedBeans' of type [org.springframework.integration.config.annotation.Disposables] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2020-07-02 20:41:25,257 WARN [main] io.undertow.websockets.jsr [Bootstrap.java : 68] UT026010: Buffer pool was not set on WebSocketDeploymentInfo, the default pool will be used
+2020-07-02 20:41:25,297 INFO [main] io.undertow.servlet [ServletContextImpl.java : 364] Initializing Spring embedded WebApplicationContext
+2020-07-02 20:41:25,298 INFO [main] o.s.web.context.ContextLoader [ServletWebServerApplicationContext.java : 284] Root WebApplicationContext: initialization completed in 2812 ms
+2020-07-02 20:41:25,323 INFO [main] c.a.c.s.SentinelWebAutoConfiguration [SentinelWebAutoConfiguration.java : 97] [Sentinel Starter] register Sentinel CommonFilter with urlPatterns: [/*].
+2020-07-02 20:41:25,476 WARN [main] c.n.c.sources.URLConfigurationSource [URLConfigurationSource.java : 121] No URLs will be polled as dynamic configuration sources.
+2020-07-02 20:41:25,477 INFO [main] c.n.c.sources.URLConfigurationSource [URLConfigurationSource.java : 122] To enable URLs as dynamic configuration sources, define System property archaius.configurationSource.additionalUrls or make config.properties available on classpath.
+2020-07-02 20:41:25,487 INFO [main] c.n.config.DynamicPropertyFactory [DynamicPropertyFactory.java : 281] DynamicPropertyFactory is initialized with configuration sources: com.netflix.config.ConcurrentCompositeConfiguration@747835f5
+2020-07-02 20:41:26,392 INFO [main] com.alibaba.nacos.client.naming [InitUtils.java : 56] initializer namespace from System Property :null
+2020-07-02 20:41:26,394 INFO [main] com.alibaba.nacos.client.naming [InitUtils.java : 65] initializer namespace from System Environment :null
+2020-07-02 20:41:26,395 INFO [main] com.alibaba.nacos.client.naming [InitUtils.java : 75] initializer namespace from System Property :null
+2020-07-02 20:41:26,583 INFO [main] o.s.b.a.e.w.ServletEndpointRegistrar [ServletEndpointRegistrar.java : 74] Registered '/actuator/jolokia' to jolokia-actuator-endpoint
+2020-07-02 20:41:26,583 INFO [main] o.s.b.a.e.w.ServletEndpointRegistrar [ServletEndpointRegistrar.java : 74] Registered '/actuator/hystrix.stream' to hystrix.stream-actuator-endpoint
+2020-07-02 20:41:26,667 INFO [main] o.s.job.executor.config.XxlJobConfig [XxlJobConfig.java : 43] >>>>>>>>>>> xxl-job config init.
+2020-07-02 20:41:26,679 INFO [main] c.x.job.core.executor.XxlJobExecutor [XxlJobExecutor.java : 211] >>>>>>>>>>> xxl-job register jobhandler success, name:commandJobHandler, jobHandler:com.xxl.job.core.handler.impl.MethodJobHandler@281b2dfd[class org.springblade.job.executor.jobhandler.SampleXxlJob#commandJobHandler]
+2020-07-02 20:41:26,680 INFO [main] c.x.job.core.executor.XxlJobExecutor [XxlJobExecutor.java : 211] >>>>>>>>>>> xxl-job register jobhandler success, name:shardingJobHandler, jobHandler:com.xxl.job.core.handler.impl.MethodJobHandler@492be039[class org.springblade.job.executor.jobhandler.SampleXxlJob#shardingJobHandler]
+2020-07-02 20:41:26,680 INFO [main] c.x.job.core.executor.XxlJobExecutor [XxlJobExecutor.java : 211] >>>>>>>>>>> xxl-job register jobhandler success, name:demoJobHandler, jobHandler:com.xxl.job.core.handler.impl.MethodJobHandler@1cd2143b[class org.springblade.job.executor.jobhandler.SampleXxlJob#demoJobHandler]
+2020-07-02 20:41:26,680 INFO [main] c.x.job.core.executor.XxlJobExecutor [XxlJobExecutor.java : 211] >>>>>>>>>>> xxl-job register jobhandler success, name:httpJobHandler, jobHandler:com.xxl.job.core.handler.impl.MethodJobHandler@1118d539[class org.springblade.job.executor.jobhandler.SampleXxlJob#httpJobHandler]
+2020-07-02 20:41:26,681 INFO [main] c.x.job.core.executor.XxlJobExecutor [XxlJobExecutor.java : 211] >>>>>>>>>>> xxl-job register jobhandler success, name:demoJobHandler2, jobHandler:com.xxl.job.core.handler.impl.MethodJobHandler@601d6622[class org.springblade.job.executor.jobhandler.SampleXxlJob#demoJobHandler2]
+2020-07-02 20:41:26,708 WARN [main] c.n.c.sources.URLConfigurationSource [URLConfigurationSource.java : 121] No URLs will be polled as dynamic configuration sources.
+2020-07-02 20:41:26,709 INFO [main] c.n.c.sources.URLConfigurationSource [URLConfigurationSource.java : 122] To enable URLs as dynamic configuration sources, define System property archaius.configurationSource.additionalUrls or make config.properties available on classpath.
+2020-07-02 20:41:26,755 INFO [main] o.s.s.c.ThreadPoolTaskExecutor [ExecutorConfigurationSupport.java : 171] Initializing ExecutorService 'applicationTaskExecutor'
+2020-07-02 20:41:27,170 INFO [main] o.s.c.c.v.BladeRequestMappingHandlerMapping [BladeRequestMappingHandlerMapping.java : 99] Mapped "{GET /test/testRequest}" onto public org.springblade.core.tool.api.R org.springblade.job.executor.controller.TestController.testRequest(java.lang.String)
+2020-07-02 20:41:27,171 INFO [main] o.s.c.c.v.BladeRequestMappingHandlerMapping [BladeRequestMappingHandlerMapping.java : 99] Mapped "{ /error}" onto public org.springframework.http.ResponseEntity<java.util.Map<java.lang.String, java.lang.Object>> org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController.error(javax.servlet.http.HttpServletRequest)
+2020-07-02 20:41:27,171 INFO [main] o.s.c.c.v.BladeRequestMappingHandlerMapping [BladeRequestMappingHandlerMapping.java : 99] Mapped "{ /error, produces [text/html]}" onto public org.springframework.web.servlet.ModelAndView org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController.errorHtml(javax.servlet.http.HttpServletRequest,javax.servlet.http.HttpServletResponse)
+2020-07-02 20:41:27,328 INFO [main] o.s.b.a.e.web.EndpointLinksResolver [EndpointLinksResolver.java : 58] Exposing 25 endpoint(s) beneath base path '/actuator'
+2020-07-02 20:41:27,400 INFO [main] o.s.s.c.ThreadPoolTaskScheduler [ExecutorConfigurationSupport.java : 171] Initializing ExecutorService
+2020-07-02 20:41:28,048 INFO [main] o.s.b.f.a.AutowiredAnnotationBeanPostProcessor [AutowiredAnnotationBeanPostProcessor.java : 344] Inconsistent constructor declaration on bean with name 'org.springblade.core.launch.server.ServerInfo': single autowire-marked constructor flagged as optional - this constructor is effectively required since there is no default constructor to fall back to: public org.springblade.core.launch.server.ServerInfo$$EnhancerBySpringCGLIB$$1c1bdf4e(org.springframework.boot.autoconfigure.web.ServerProperties)
+2020-07-02 20:41:28,788 INFO [main] o.s.s.c.ThreadPoolTaskScheduler [ExecutorConfigurationSupport.java : 171] Initializing ExecutorService 'taskScheduler'
+2020-07-02 20:41:28,843 INFO [main] c.x.r.r.p.XxlRpcProviderFactory [XxlRpcProviderFactory.java : 197] >>>>>>>>>>> xxl-rpc, provider factory add service success. serviceKey = com.xxl.job.core.biz.ExecutorBiz, serviceBean = class com.xxl.job.core.biz.impl.ExecutorBizImpl
+2020-07-02 20:41:29,317 INFO [main] o.s.i.m.IntegrationMBeanExporter [IntegrationMBeanExporter.java : 767] Registering MessageChannel nullChannel
+2020-07-02 20:41:29,339 INFO [main] o.s.i.m.IntegrationMBeanExporter [IntegrationMBeanExporter.java : 767] Registering MessageChannel errorChannel
+2020-07-02 20:41:29,543 INFO [main] o.s.i.m.IntegrationMBeanExporter [IntegrationMBeanExporter.java : 785] Registering MessageHandler errorLogger
+2020-07-02 20:41:29,648 INFO [main] o.s.i.endpoint.EventDrivenConsumer [EventDrivenConsumer.java : 107] Adding {logging-channel-adapter:_org.springframework.integration.errorLogger} as a subscriber to the 'errorChannel' channel
+2020-07-02 20:41:29,649 INFO [main] o.s.i.c.PublishSubscribeChannel [AbstractSubscribableChannel.java : 64] Channel 'blade-xxljob-1.errorChannel' has 1 subscriber(s).
+2020-07-02 20:41:29,650 INFO [main] o.s.i.endpoint.EventDrivenConsumer [AbstractEndpoint.java : 159] started _org.springframework.integration.errorLogger
+2020-07-02 20:41:29,757 INFO [main] io.undertow [Undertow.java : 117] starting server: Undertow - 2.0.29.Final
+2020-07-02 20:41:29,777 INFO [main] org.xnio [Xnio.java : 104] XNIO version 3.3.8.Final
+2020-07-02 20:41:29,821 INFO [main] org.xnio.nio [NioXnio.java : 55] XNIO NIO Implementation Version 3.3.8.Final
+2020-07-02 20:41:29,841 INFO [Thread-29] com.xxl.rpc.remoting.net.Server [NettyHttpServer.java : 66] >>>>>>>>>>> xxl-rpc remoting server start success, nettype = com.xxl.rpc.remoting.net.impl.netty_http.server.NettyHttpServer, port = 7018
+2020-07-02 20:41:30,086 INFO [main] o.s.b.w.e.u.UndertowServletWebServer [UndertowServletWebServer.java : 144] Undertow started on port(s) 7008 (http) with context path ''
+2020-07-02 20:41:30,101 INFO [main] com.alibaba.nacos.client.naming [BeatReactor.java : 58] [BEAT] adding beat: {"cluster":"DEFAULT","ip":"192.168.45.1","metadata":{"preserved.register.source":"SPRING_CLOUD"},"period":5000,"port":7008,"scheduled":false,"serviceName":"DEFAULT_GROUP@@blade-xxljob","stopped":false,"weight":1.0} to beat map.
+2020-07-02 20:41:30,275 INFO [main] com.alibaba.nacos.client.naming [NamingProxy.java : 175] [REGISTER-SERVICE] public registering service DEFAULT_GROUP@@blade-xxljob with instance: {"clusterName":"DEFAULT","enabled":true,"ephemeral":true,"healthy":true,"instanceHeartBeatInterval":5000,"instanceHeartBeatTimeOut":15000,"ip":"192.168.45.1","ipDeleteTimeout":30000,"metadata":{"preserved.register.source":"SPRING_CLOUD"},"port":7008,"weight":1.0}
+2020-07-02 20:41:30,312 INFO [main] c.a.c.n.r.NacosServiceRegistry [NacosServiceRegistry.java : 64] nacos registry, DEFAULT_GROUP blade-xxljob 192.168.45.1:7008 register finished
+2020-07-02 20:41:30,919 INFO [main] o.s.core.launch.StartEventListener [StartEventListener.java : 45] ---[BLADE-XXLJOB]---启动完成，当前使用的端口:[7008]，环境变量:[dev]---
+2020-07-02 20:41:30,923 INFO [main] o.s.job.executor.JobApplication [StartupInfoLogger.java : 59] Started JobApplication in 11.918 seconds (JVM running for 13.99)
+2020-07-02 20:41:30,932 INFO [main] c.a.n.c.config.impl.ClientWorker [ClientWorker.java : 202] [fixed-127.0.0.1_8848] [subscribe] blade-xxljob.yaml+DEFAULT_GROUP
+2020-07-02 20:41:30,934 INFO [main] c.a.n.client.config.impl.CacheData [CacheData.java : 79] [fixed-127.0.0.1_8848] [add-listener] ok, tenant=, dataId=blade-xxljob.yaml, group=DEFAULT_GROUP, cnt=1
+2020-07-02 20:41:30,934 INFO [main] c.a.n.c.config.impl.ClientWorker [ClientWorker.java : 202] [fixed-127.0.0.1_8848] [subscribe] blade-xxljob-dev.yaml+DEFAULT_GROUP
+2020-07-02 20:41:30,935 INFO [main] c.a.n.client.config.impl.CacheData [CacheData.java : 79] [fixed-127.0.0.1_8848] [add-listener] ok, tenant=, dataId=blade-xxljob-dev.yaml, group=DEFAULT_GROUP, cnt=1
+2020-07-02 20:41:30,936 INFO [main] c.a.n.c.config.impl.ClientWorker [ClientWorker.java : 202] [fixed-127.0.0.1_8848] [subscribe] blade-xxljob+DEFAULT_GROUP
+2020-07-02 20:41:30,936 INFO [main] c.a.n.client.config.impl.CacheData [CacheData.java : 79] [fixed-127.0.0.1_8848] [add-listener] ok, tenant=, dataId=blade-xxljob, group=DEFAULT_GROUP, cnt=1
+2020-07-02 20:41:31,621 INFO [RMI TCP Connection(8)-192.168.218.1] io.undertow.servlet [ServletContextImpl.java : 364] Initializing Spring DispatcherServlet 'dispatcherServlet'
+2020-07-02 20:41:31,621 INFO [RMI TCP Connection(8)-192.168.218.1] o.s.web.servlet.DispatcherServlet [FrameworkServlet.java : 525] Initializing Servlet 'dispatcherServlet'
+2020-07-02 20:41:31,644 INFO [RMI TCP Connection(8)-192.168.218.1] o.s.web.servlet.DispatcherServlet [FrameworkServlet.java : 547] Completed initialization in 22 ms
+2020-07-02 20:41:31,901 ERROR [xxl-job, executor ExecutorRegistryThread] c.x.job.core.util.XxlJobRemotingUtil [XxlJobRemotingUtil.java : 146] Connection refused: connect
+java.net.ConnectException: Connection refused: connect
+	at java.net.DualStackPlainSocketImpl.waitForConnect(Native Method)
+	at java.net.DualStackPlainSocketImpl.socketConnect(DualStackPlainSocketImpl.java:85)
+	at java.net.AbstractPlainSocketImpl.doConnect(AbstractPlainSocketImpl.java:350)
+	at java.net.AbstractPlainSocketImpl.connectToAddress(AbstractPlainSocketImpl.java:206)
+	at java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:188)
+	at java.net.PlainSocketImpl.connect(PlainSocketImpl.java:172)
+	at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:392)
+	at java.net.Socket.connect(Socket.java:606)
+	at sun.net.NetworkClient.doConnect(NetworkClient.java:175)
+	at sun.net.www.http.HttpClient.openServer(HttpClient.java:463)
+	at sun.net.www.http.HttpClient.openServer(HttpClient.java:558)
+	at sun.net.www.http.HttpClient.<init>(HttpClient.java:242)
+	at sun.net.www.http.HttpClient.New(HttpClient.java:339)
+	at sun.net.www.http.HttpClient.New(HttpClient.java:357)
+	at sun.net.www.protocol.http.HttpURLConnection.getNewHttpClient(HttpURLConnection.java:1226)
+	at sun.net.www.protocol.http.HttpURLConnection.plainConnect0(HttpURLConnection.java:1162)
+	at sun.net.www.protocol.http.HttpURLConnection.plainConnect(HttpURLConnection.java:1056)
+	at sun.net.www.protocol.http.HttpURLConnection.connect(HttpURLConnection.java:990)
+	at com.xxl.job.core.util.XxlJobRemotingUtil.postBody(XxlJobRemotingUtil.java:94)
+	at com.xxl.job.core.biz.client.AdminBizClient.registry(AdminBizClient.java:41)
+	at com.xxl.job.core.thread.ExecutorRegistryThread$1.run(ExecutorRegistryThread.java:48)
+	at java.lang.Thread.run(Thread.java:748)
+2020-07-02 20:41:31,902 INFO [xxl-job, executor ExecutorRegistryThread] c.x.j.c.t.ExecutorRegistryThread [ExecutorRegistryThread.java : 54] >>>>>>>>>>> xxl-job registry fail, registryParam:RegistryParam{registryGroup='EXECUTOR', registryKey='blade-xxljob', registryValue='127.0.0.1:7018'}, registryResult:ReturnT [code=500, msg=xxl-rpc remoting error(Connection refused: connect), for url : http://127.0.0.1:7009/xxl-job-admin/api/registry, content=null]
