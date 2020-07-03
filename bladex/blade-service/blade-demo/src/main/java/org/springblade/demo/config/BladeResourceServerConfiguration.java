@@ -8,11 +8,7 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.E
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
 
 
-/**
- * 自定义登录成功配置
- *
- * @author Chill
- */
+
 @Configuration
 @AllArgsConstructor
 @EnableResourceServer
@@ -28,7 +24,7 @@ public class BladeResourceServerConfiguration extends ResourceServerConfigurerAd
 			.and()
 			.authorizeRequests()
 			.antMatchers(
-				"/blog/list/**"
+				"/blog/**"
 			).permitAll()
 			.anyRequest().authenticated().and()
 			.csrf().disable();

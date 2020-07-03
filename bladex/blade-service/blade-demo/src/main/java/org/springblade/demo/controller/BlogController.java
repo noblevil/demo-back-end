@@ -55,11 +55,19 @@ public class BlogController extends BladeController {
 	 * 详情
 	 */
 	@GetMapping("/detail")
-
 	@ApiOperation(value = "详情", notes = "传入blog")
 	public R<BlogVO> detail(Blog blog) {
+
+		System.out.println(blog);
+
 		Blog detail = blogService.getOne(Condition.getQueryWrapper(blog));
 		return R.data(BlogWrapper.build().entityVO(detail));
+	}
+
+	@GetMapping("/test")
+	@ApiOperation(value = "测试", notes = "传入blog")
+	public String test() {
+		return "dsadwdwadwad";
 	}
 
 	/**
