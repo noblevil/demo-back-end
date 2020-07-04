@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.springblade.demo.mapper.RelOrgTeachMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="relOrgTeachResultMap" type="org.springblade.demo.entity.RelOrgTeach">
+        <id column="rel_id" property="relId"/>
+        <result column="org_id" property="orgId"/>
+        <result column="teach_id" property="teachId"/>
+        <result column="org_teach_status" property="orgTeachStatus"/>
+        <result column="start_time" property="startTime"/>
+        <result column="end_time" property="endTime"/>
+    </resultMap>
+
+
+    <select id="selectRelOrgTeachPage" resultMap="relOrgTeachResultMap">
+        select * from rel_org_teach where is_deleted = 0
+    </select>
+
+</mapper>

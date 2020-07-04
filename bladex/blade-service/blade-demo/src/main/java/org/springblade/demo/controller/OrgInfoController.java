@@ -103,6 +103,7 @@ public class OrgInfoController extends BladeController {
 		return R.data(list);
 	}
 
+	//===========================以下为自动生成的接口==============================
 
 	/**
 	 * 分页 机构信息

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.springblade.demo.mapper.TeachInfoMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="teachInfoResultMap" type="org.springblade.demo.entity.TeachInfo">
+        <id column="teach_id" property="teachId"/>
+        <result column="teach_name" property="teachName"/>
+        <result column="sex" property="sex"/>
+        <result column="teach_birth" property="teachBirth"/>
+        <result column="teaching_subject" property="teachingSubject"/>
+        <result column="is_teach_qualif_cert" property="isTeachQualifCert"/>
+        <result column="teach_qualif_class" property="teachQualifClass"/>
+        <result column="certificate_num" property="certificateNum"/>
+        <result column="professional_title" property="professionalTitle"/>
+        <result column="country_nature" property="countryNature"/>
+        <result column="nationality" property="nationality"/>
+        <result column="highest_education" property="highestEducation"/>
+        <result column="educational_institution" property="educationalInstitution"/>
+        <result column="highest_degree" property="highestDegree"/>
+        <result column="degree_obtained_institution" property="degreeObtainedInstitution"/>
+        <result column="major" property="major"/>
+        <result column="graduation_date" property="graduationDate"/>
+        <result column="work_type" property="workType"/>
+        <result column="id_type" property="idType"/>
+        <result column="id_num" property="idNum"/>
+        <result column="native_place" property="nativePlace"/>
+        <result column="political_status" property="politicalStatus"/>
+    </resultMap>
+
+
+    <select id="selectTeachInfoPage" resultMap="teachInfoResultMap">
+        select * from teach_info where is_deleted = 0
+    </select>
+
+</mapper>

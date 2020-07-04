@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.springblade.demo.mapper.CourseMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="courseResultMap" type="org.springblade.demo.entity.Course">
+        <id column="course_id" property="courseId"/>
+        <result column="org_id" property="orgId"/>
+        <result column="course_name" property="courseName"/>
+        <result column="course_subject" property="courseSubject"/>
+        <result column="course_level" property="courseLevel"/>
+        <result column="course_link" property="courseLink"/>
+        <result column="content_intro" property="contentIntro"/>
+        <result column="valid_period" property="validPeriod"/>
+        <result column="student_rank" property="studentRank"/>
+        <result column="student_grade" property="studentGrade"/>
+        <result column="total_lessons" property="totalLessons"/>
+        <result column="textbook" property="textbook"/>
+        <result column="publish_company" property="publishCompany"/>
+        <result column="ISBN_number" property="isbnNumber"/>
+    </resultMap>
+
+
+    <select id="selectCoursePage" resultMap="courseResultMap">
+        select * from course where is_deleted = 0
+    </select>
+
+</mapper>
