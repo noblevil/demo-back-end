@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    <mapper namespace="org.springblade.demo.mapper.OrgInfoMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="orgInfoResultMap" type="org.springblade.demo.entity.OrgInfo">
+        <id column="org_id" property="orgId"/>
+        <result column="org_type" property="orgType"/>
+        <result column="org_name" property="orgName"/>
+        <result column="org_simply_name" property="orgSimplyName"/>
+        <result column="established_date" property="establishedDate"/>
+        <result column="org_phone" property="orgPhone"/>
+        <result column="register_address" property="registerAddress"/>
+        <result column="often_address" property="oftenAddress"/>
+        <result column="is_invest_abroad" property="isInvestAbroad"/>
+        <result column="school_licence" property="schoolLicence"/>
+        <result column="school_licence_department" property="schoolLicenceDepartment"/>
+        <result column="unified_code" property="unifiedCode"/>
+        <result column="linkman_one" property="linkmanOne"/>
+        <result column="linkman_one_phone" property="linkmanOnePhone"/>
+        <result column="linkman_two" property="linkmanTwo"/>
+        <result column="linkman_two_phone" property="linkmanTwoPhone"/>
+        <result column="train_type" property="trainType"/>
+        <result column="train_content" property="trainContent"/>
+        <result column="train_form" property="trainForm"/>
+        <result column="enroll_object" property="enrollObject"/>
+        <result column="enroll_region" property="enrollRegion"/>
+        <result column="business_license" property="businessLicense"/>
+        <result column="related_certificates" property="relatedCertificates"/>
+        <result column="list_type" property="listType"/>
+    </resultMap>
+
+
+    <select id="selectOrgInfoPage" resultMap="orgInfoResultMap">
+        select * from org_info where is_deleted = 0
+    </select>
+
+<!--    <select id="selectById" resultMap="orgInfoResultMap">-->
+<!--        select * from org_info where org_id = #{id}-->
+<!--    </select>-->
+
+</mapper>
