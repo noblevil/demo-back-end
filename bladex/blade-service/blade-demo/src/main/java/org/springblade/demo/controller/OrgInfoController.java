@@ -56,10 +56,10 @@ public class OrgInfoController extends BladeController {
 	@GetMapping("/getOrgDetailById")  //【API-1】
 	@ApiOperationSupport(order = 1)
 	@ApiOperation(value = "根据机构id获取机构信息详情", notes = "传入机构id")
-	public R<OrgInfo> getOrgDetailById(Integer id) {
-		OrgInfo orgid = new OrgInfo();
-		orgid.setOrgId(id);
-		OrgInfo detail = orgInfoService.getOne(Condition.getQueryWrapper(orgid));
+	public R<OrgInfo> getOrgDetailById(Integer orgId) {
+		OrgInfo org = new OrgInfo();
+		org.setOrgId(orgId);
+		OrgInfo detail = orgInfoService.getOne(Condition.getQueryWrapper(org));
 		return R.data(detail);
 	}
 

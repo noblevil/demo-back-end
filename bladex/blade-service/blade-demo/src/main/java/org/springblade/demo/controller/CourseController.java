@@ -54,7 +54,6 @@ public class CourseController extends BladeController {
 	private ICourseService courseService;
 	private ICourseClassService courseClassService;
 
-
 	/**
 	 * 根据机构id获取所属课程信息
 	 * 例如：http://localhost:9101/course/getCourseListById?orgId=2

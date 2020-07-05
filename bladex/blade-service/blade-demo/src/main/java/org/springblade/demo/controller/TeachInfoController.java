@@ -96,19 +96,30 @@ public class TeachInfoController extends BladeController {
 	}
 
 
+
+
 	/**
 	 * 筛选：条件查询  获取教师信息详情（根据声明实体的名）
-	 * 根据教师名称查询：http://localhost:9101/teachinfo/queryTeachList?teachName=小明
-	 * 根据教师id查询：http://localhost:9101/teachinfo/queryTeachList?teachId=2
-	 * 多个条件查询：http://localhost:9101/teachinfo/queryTeachList?professionalTitle=讲师&nationality=中国
+	 * 例子：http://localhost:9101/teachinfo/queryTeachList?orgId=1&professionalTitle=讲师
 	 * 参数为空：返回全部
 	 */
 	@GetMapping("/queryTeachList")  //【API-7】
 	@ApiOperationSupport(order = 1)
-	@ApiOperation(value = "条件查询：获取教师信息详情", notes = "传入任意字段的值")
-	public  R<List<TeachInfo>> queryOrgList(TeachInfo teachInfo) {
-		List<TeachInfo> list = teachInfoService.list(Condition.getQueryWrapper(teachInfo));
-		return R.data(list);
+	@ApiOperation(value = "条件查询：获取教师信息详情", notes = "传入orgId+教师表任意字段的值（除教师id）")
+	public  R<List<TeachInfo>> queryOrgList(Integer orgId,TeachInfo teachInfo) {
+		List<TeachInfo> resultList=new ArrayList<>();
+		RelOrgTeach relOrgTeach=new RelOrgTeach() ;
+		relOrgTeach.setOrgId(orgId);
+		List<RelOrgTeach> teachIds=relOrgTeachService.list(Condition.getQueryWrapper(relOrgTeach));
+		for(int i=0;i<teachIds.size();++i)
+		{
+			int id=teachIds.get(i).getTeachId();
+			TeachInfo tInfo = teachInfo;    //根据传入参数设置教师字段的查询条件
+			tInfo.setTeachId(id);    //根据教师id进行筛选
+			TeachInfo teachDetail=teachInfoService.getOne(Condition.getQueryWrapper(tInfo));
+			if(teachDetail!=null) resultList.add(teachDetail);
+		}
+		return R.data(resultList);
 	}
 
 	//===========================以下为自动生成的接口==============================
