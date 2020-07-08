@@ -26,7 +26,7 @@ public class BladeResourceServerConfiguration extends ResourceServerConfigurerAd
 			.antMatchers(
 				"/blog/**","/orginfo/**","/teachinfo/**","/course/**"
 			).permitAll();
-////			.anyRequest().authenticated().and()
+//			.anyRequest().authenticated().and()
 //			.csrf().disable();
 	}
 
