@@ -49,6 +49,11 @@ public class InfoController extends BladeController {
 
 	private IInfoService infoService;
 
+	@PostMapping("/ceshi")
+	public String tes(@RequestParam String str) {
+		return str + "post success";
+	}
+
 	/**
 	 * 详情
 	 */
@@ -69,7 +74,6 @@ public class InfoController extends BladeController {
 		IPage<Info> pages = infoService.page(Condition.getPage(query), Condition.getQueryWrapper(info));
 		return R.data(InfoWrapper.build().pageVO(pages));
 	}
-
 
 	/**
 	 * 自定义分页 机构信息

@@ -20,6 +20,8 @@ package org.springblade.demo;
 import org.springblade.common.constant.CommonConstant;
 import org.springblade.core.launch.BladeApplication;
 import org.springblade.core.launch.constant.AppConstant;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.cloud.client.SpringCloudApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 
@@ -31,6 +33,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 
 @SpringCloudApplication
 @EnableFeignClients(AppConstant.BASE_PACKAGES)
+@SpringBootApplication(exclude = {SecurityAutoConfiguration.class})
 // @SeataCloudApplication
 public class DemoApplication {
 
