@@ -1,5 +1,6 @@
 package org.springblade.demo.common.exception.handler;
 
+import org.springblade.demo.common.exception.AuthException;
 import org.springblade.demo.common.exception.CustomException;
 import org.springblade.demo.common.response.Result;
 import org.springblade.demo.common.response.ResultCode;
@@ -23,6 +24,16 @@ import java.util.List;
 public class GlobalExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
+	/**
+	 * 处理权限异常
+	 */
+	@ExceptionHandler(AuthException.class)
+	public Result handleException(AuthException e) {
+		// 打印异常信息
+		log.error("### 异常信息:{} ###", e.getMessage());
+		return new Result(e.getResultCode());
+	}
 
     /**
      * 处理自定义异常

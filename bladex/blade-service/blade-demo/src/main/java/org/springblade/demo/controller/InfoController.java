@@ -27,6 +27,7 @@ import org.springblade.core.mp.support.Condition;
 import org.springblade.core.mp.support.Query;
 import org.springblade.core.tool.api.R;
 import org.springblade.core.tool.utils.Func;
+import org.springblade.demo.annotation.Role;
 import org.springframework.web.bind.annotation.*;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.springblade.demo.entity.Info;
@@ -50,6 +51,7 @@ public class InfoController extends BladeController {
 	private IInfoService infoService;
 
 	@PostMapping("/ceshi")
+	@Role("")
 	public String tes(@RequestParam String str) {
 		return str + "post success";
 	}

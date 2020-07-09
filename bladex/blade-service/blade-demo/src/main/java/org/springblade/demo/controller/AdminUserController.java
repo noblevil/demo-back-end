@@ -3,6 +3,7 @@ package org.springblade.demo.controller;
 import com.alibaba.fastjson.JSONObject;
 import lombok.AllArgsConstructor;
 import org.springblade.demo.annotation.JwtIgnore;
+import org.springblade.demo.annotation.Role;
 import org.springblade.demo.common.response.Result;
 import org.springblade.demo.entity.OrgInfo;
 import org.springblade.demo.entity.User;
@@ -31,22 +32,28 @@ public class AdminUserController {
     private Audience audience;
 
     @PostMapping("/ceshi")
+	@Role({"teach", "org"})
 	public Result t(@RequestBody User user){
     	return Result.SUCCESS(user.getUsername());
 	}
 
     @PostMapping("/signin")
 	@JwtIgnore
-    public Result adminLogin(HttpServletResponse response, String username, String password) {
+    public Result adminLogin(HttpServletResponse response, String account, String password, String role) {
 
+		/**
+		 * 通过account、password和role，验证用户身份
+		 * account可以是手机号、邮箱和账户
+		 * 需返回用户的username和ID，用于构造token
+ 		 */
         if(!password.equals("123456"))
             return Result.FAIL("密码错误");
 
 		String userId = "1";
-		String role = "admin";
+		String userName = "cc";
 
         // 创建token
-        String token = JwtTokenUtil.createJWT(userId, username, role, audience);
+        String token = JwtTokenUtil.createJWT(userId, userName, role, audience);
         log.info("### 登录成功, token={} ###", token);
 
         // 将token放在响应头

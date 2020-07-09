@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import javax.crypto.spec.SecretKeySpec;
 import javax.xml.bind.DatatypeConverter;
 import java.security.Key;
+import java.util.Base64;
 import java.util.Date;
 
 /**
@@ -44,7 +45,7 @@ public class JwtTokenUtil {
             log.error("===== Token过期 =====", eje);
             throw new CustomException(ResultCode.PERMISSION_TOKEN_EXPIRED);
         } catch (Exception e){
-            log.error("===== token解析异常 =====", e);
+            log.error("===== Token解析异常 =====", e);
             throw new CustomException(ResultCode.PERMISSION_TOKEN_INVALID);
         }
     }
@@ -119,6 +120,18 @@ public class JwtTokenUtil {
         String userId = parseJWT(token, base64Security).get("userId", String.class);
         return Base64Util.decode(userId);
     }
+
+	/**
+	 * 从token中获取用户role
+	 * role值不需要再使用Base64工具解码
+	 * @param token
+	 * @param base64Security
+	 * @return
+	 */
+    public static String getUserRole(String token, String base64Security) {
+    	String role = parseJWT(token, base64Security).get("role", String.class);
+    	return role;
+	}
 
     /**
      * 是否已过期
