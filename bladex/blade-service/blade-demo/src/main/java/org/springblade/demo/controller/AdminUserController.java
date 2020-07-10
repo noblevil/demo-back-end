@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import org.springblade.demo.annotation.JwtIgnore;
 import org.springblade.demo.annotation.Role;
 import org.springblade.demo.common.response.Result;
-import org.springblade.demo.entity.OrgInfo;
+import org.springblade.demo.common.RoleCode;
 import org.springblade.demo.entity.User;
 import org.springblade.demo.model.Audience;
 import org.springblade.demo.util.JwtTokenUtil;
@@ -13,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
 
 /**
  * ========================
@@ -32,7 +31,7 @@ public class AdminUserController {
     private Audience audience;
 
     @PostMapping("/ceshi")
-	@Role({"teach", "org"})
+	@Role(include = {RoleCode.TEACH})
 	public Result t(@RequestBody User user){
     	return Result.SUCCESS(user.getUsername());
 	}
@@ -42,13 +41,20 @@ public class AdminUserController {
     public Result adminLogin(HttpServletResponse response, String account, String password, String role) {
 
 		/**
+		 * 验证role值的合法性
+		 */
+		if(!RoleCode.checkValidity(role)) {
+			return Result.FAIL("角色类型错误");
+		}
+
+		/**
 		 * 通过account、password和role，验证用户身份
 		 * account可以是手机号、邮箱和账户
 		 * 需返回用户的username和ID，用于构造token
  		 */
-        if(!password.equals("123456"))
-            return Result.FAIL("密码错误");
-
+        if(!password.equals("123456")) {
+			return Result.FAIL("密码错误");
+		}
 		String userId = "1";
 		String userName = "cc";
 

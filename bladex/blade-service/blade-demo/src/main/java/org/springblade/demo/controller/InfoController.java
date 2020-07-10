@@ -28,6 +28,7 @@ import org.springblade.core.mp.support.Query;
 import org.springblade.core.tool.api.R;
 import org.springblade.core.tool.utils.Func;
 import org.springblade.demo.annotation.Role;
+import org.springblade.demo.common.RoleCode;
 import org.springframework.web.bind.annotation.*;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.springblade.demo.entity.Info;
@@ -44,6 +45,7 @@ import org.springblade.core.boot.ctrl.BladeController;
  */
 @RestController
 @AllArgsConstructor
+@Role(include = {RoleCode.ORG})
 @RequestMapping("/info")
 @Api(value = "机构信息 ", tags = "机构信息 接口")
 public class InfoController extends BladeController {
@@ -51,7 +53,7 @@ public class InfoController extends BladeController {
 	private IInfoService infoService;
 
 	@PostMapping("/ceshi")
-	@Role("")
+	@Role(include = {RoleCode.TEACH})
 	public String tes(@RequestParam String str) {
 		return str + "post success";
 	}
