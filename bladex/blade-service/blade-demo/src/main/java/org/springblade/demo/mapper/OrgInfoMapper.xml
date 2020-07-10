@@ -32,7 +32,7 @@
 
 
     <select id="selectOrgInfoPage" resultMap="orgInfoResultMap">
-        select * from org_info where is_deleted = 0
+        select * from org_info
     </select>
 
 <!--    <select id="selectById" resultMap="orgInfoResultMap">-->
