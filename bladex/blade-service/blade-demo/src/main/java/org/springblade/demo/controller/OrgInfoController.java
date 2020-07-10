@@ -27,12 +27,18 @@ import org.springblade.core.mp.support.Condition;
 import org.springblade.core.mp.support.Query;
 import org.springblade.core.tool.api.R;
 import org.springblade.core.tool.utils.Func;
+import org.springblade.demo.annotation.JwtIgnore;
+import org.springblade.demo.entity.Course;
 import org.springblade.demo.entity.OrgInfo;
+import org.springblade.demo.entity.RelOrgTeach;
+import org.springblade.demo.service.ICourseService;
 import org.springblade.demo.service.IOrgInfoService;
 import org.springblade.demo.vo.OrgInfoVO;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -48,11 +54,13 @@ import java.util.List;
 public class OrgInfoController extends BladeController {
 
 	private IOrgInfoService orgInfoService;
+	private ICourseService courseService;
 
 	/**
 	 * 根据机构id获取机构信息详情
 	 * 例如：http://localhost:9101/orginfo/getOrgDetailById?id=2
 	 */
+	@JwtIgnore
 	@GetMapping("/getOrgDetailById")  //【API-1】
 	@ApiOperationSupport(order = 1)
 	@ApiOperation(value = "根据机构id获取机构信息详情", notes = "传入机构id")
@@ -68,6 +76,7 @@ public class OrgInfoController extends BladeController {
 	 * 例如：http://localhost:9101/orginfo/getAllOrgList
 	 * @return
 	 */
+	@JwtIgnore
 	@GetMapping("/getAllOrgList")  //【API-2】
 	@ApiOperationSupport(order = 1)
 	@ApiOperation(value = "获取所有机构信息详情")
@@ -80,6 +89,7 @@ public class OrgInfoController extends BladeController {
 	 * 分页（第几页，每页多少条数据） 查询所有机构信息，
 	 * 例如：http://localhost:9101/orginfo/getAllOrgListByPage?current=2&size=1（第二页，每页1条信息）
 	 */
+	@JwtIgnore
 	@GetMapping("/getAllOrgListByPage")    //【API-2-1】
 	@ApiOperationSupport(order = 2)
 	@ApiOperation(value = "分页", notes = "传入页号current和每个页面返回数量size")
@@ -95,11 +105,47 @@ public class OrgInfoController extends BladeController {
 	 * 多个条件查询：http://localhost:9101/orginfo/queryOrgList?orgId=2&orgName=机构2
 	 * 参数为空：返回全部
 	 */
+	@JwtIgnore
 	@GetMapping("/queryOrgList")  //【API-3】
 	@ApiOperationSupport(order = 1)
 	@ApiOperation(value = "条件查询：获取机构信息详情", notes = "传入任意字段的值")
-	public  R<List<OrgInfo>> queryOrgList(OrgInfo orgInfo) {
+	public  R<List<OrgInfo>> queryOrgList(String trainSubject, OrgInfo orgInfo) {
+
+		// 实现拿来符合出来 科目 之外的机构信息
 		List<OrgInfo> list = orgInfoService.list(Condition.getQueryWrapper(orgInfo));
+
+		// 如果科目非空 则要处理
+		if(!trainSubject.equals("")){
+
+			List<OrgInfo> returnList = new ArrayList<OrgInfo>();
+			for (OrgInfo org: list) {
+				// 处理每一个机构
+				int orgId = org.getOrgId();
+				Course course = new Course();
+				course.setOrgId(orgId);
+				//得到机构所有的对应课程
+				List<Course> courseList = courseService.list(Condition.getQueryWrapper(course));
+				// 保存 科目 列表
+				List<String> trainSubjects = new ArrayList<String>();
+				// 得到没有去重的科目列表
+				for (Course obj : courseList) {
+					trainSubjects.add(obj.getCourseSubject());
+				}
+				// 如果列表包含 这个科目 就添加到 return list
+				if(trainSubjects.contains(trainSubject)){
+					returnList.add(org);
+				}
+
+			}
+
+			list = returnList;
+
+		}
+
+
+
+
+
 		return R.data(list);
 	}
 

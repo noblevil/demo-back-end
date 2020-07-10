@@ -16,6 +16,7 @@
  */
 package org.springblade.demo.entity;
 
+import com.baomidou.mybatisplus.annotation.TableId;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -39,6 +40,7 @@ public class OrgInfo implements Serializable {
 	* 企业ID
 	*/
 		@ApiModelProperty(value = "企业ID")
+		@TableId(value = "org_id")
 		private Integer orgId;
 	/**
 	* 机构类型
@@ -55,6 +57,8 @@ public class OrgInfo implements Serializable {
 	*/
 		@ApiModelProperty(value = "企业简称")
 		private String orgSimplyName;
+
+	@ApiModelProperty(value = "设立日期")
 	private LocalDate establishedDate;
 	/**
 	* 企业电话号码
