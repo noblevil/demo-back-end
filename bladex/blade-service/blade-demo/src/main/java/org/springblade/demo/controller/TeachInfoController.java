@@ -16,6 +16,7 @@
  */
 package org.springblade.demo.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -28,14 +29,21 @@ import org.springblade.core.mp.support.Query;
 import org.springblade.core.tool.api.R;
 import org.springblade.core.tool.utils.Func;
 import org.springblade.demo.annotation.JwtIgnore;
+import org.springblade.demo.annotation.Role;
+import org.springblade.demo.common.RoleCode;
+import org.springblade.demo.entity.OrgAccount;
 import org.springblade.demo.entity.RelOrgTeach;
+import org.springblade.demo.entity.TeachAccount;
+import org.springblade.demo.service.IOrgAccountService;
 import org.springblade.demo.service.IRelOrgTeachService;
+import org.springblade.demo.service.ITeachAccountService;
 import org.springframework.web.bind.annotation.*;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.springblade.demo.entity.TeachInfo;
 import org.springblade.demo.vo.TeachInfoVO;
 import org.springblade.demo.service.ITeachInfoService;
 import org.springblade.core.boot.ctrl.BladeController;
+import sun.text.resources.no.CollationData_no;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,6 +62,8 @@ public class TeachInfoController extends BladeController {
 
 	private ITeachInfoService teachInfoService;
 	private IRelOrgTeachService relOrgTeachService;
+	private ITeachAccountService teachAccountService;
+	private IOrgAccountService orgAccountService;
 
 	/**
 	 * 根据机构id获取所属的教师列表
@@ -124,6 +134,76 @@ public class TeachInfoController extends BladeController {
 			if(teachDetail!=null) resultList.add(teachDetail);
 		}
 		return R.data(resultList);
+	}
+
+	/**
+	 * 查询：根据teachAccount获取教师基本信息——7.11
+	 * http://localhost:9101/teachinfo/getProfile?teachAccount=教师账户名
+	 * http://cyf.ngrok2.xiaomiqiu.cn/teachinfo/getProfile?teachAccount=教师账户名
+	 * http://cyf.ngrok2.xiaomiqiu.cn/teachinfo/getProfile?teachAccount=110
+	 */
+	@JwtIgnore
+//	@Role(include = {RoleCode.TEACH})
+	@GetMapping("/getProfile")
+	@ApiOperationSupport(order = 1)
+	@ApiOperation(value = "条件查询：获取教师信息详情", notes = "传入教师账户名")
+	public R<JSONObject> getProfile(String teachAccount) {
+		TeachAccount teachAccountCondition=new TeachAccount();
+		teachAccountCondition.setTeachAccount(teachAccount);
+		//根据teachAccount查询教师id
+		try{
+			int teachId=teachAccountService.getOne(Condition.getQueryWrapper(teachAccountCondition)).getTeachId();
+			//设置查询条件
+			TeachInfo teachInfoCondition=new TeachInfo();
+			teachInfoCondition.setTeachId(teachId);
+			RelOrgTeach relOrgTeachCondition=new RelOrgTeach();
+			relOrgTeachCondition.setTeachId(teachId);
+			//结果返回
+			JSONObject result=new JSONObject();
+			result.put("teachInfo",teachInfoService.getOne(Condition.getQueryWrapper(teachInfoCondition)));
+			result.put("teachAccount",teachAccountService.getOne(Condition.getQueryWrapper(teachAccountCondition)));
+			result.put("relOrgTeach",relOrgTeachService.list(Condition.getQueryWrapper(relOrgTeachCondition)));
+			return R.data(result);
+		}
+		catch (Exception e){
+			return R.fail("教师账户不存在");
+		}
+	}
+
+	/**
+	 * 根据机构账户获取机构所属教师信息——7.11
+	 * 例如：http://localhost:9101/teachinfo/getOrgTeacherByOrgAccount?orgAccount=1101234561
+	 * http://cyf.ngrok2.xiaomiqiu.cn/teachinfo/getOrgTeacherByOrgAccount?orgAccount=机构账户名
+	 */
+	@JwtIgnore
+//	@Role(include = {RoleCode.ORG})
+	@GetMapping("/getOrgTeacherByOrgAccount")
+	@ApiOperationSupport(order = 1)
+	@ApiOperation(value = "根据机构账户获取机构所属教师信息", notes = "传入机构账户名")
+	public  R<List<TeachInfo>> getOrgTeacherByOrgAccount(String orgAccount) {
+		OrgAccount orgAccountCondition=new OrgAccount();
+		orgAccountCondition.setOrgAccount(orgAccount);
+		//根据机构账户名获得机构id
+		try{
+			int orgId=orgAccountService.getOne(Condition.getQueryWrapper(orgAccountCondition)).getOrgId();
+			//获取机构下所有教师的id
+			RelOrgTeach relOrgTeachCondition=new RelOrgTeach();
+			relOrgTeachCondition.setOrgId(orgId);
+			List<RelOrgTeach> teachIds=relOrgTeachService.list(Condition.getQueryWrapper(relOrgTeachCondition));
+			//根据教师id获取教师信息
+			List<TeachInfo> result=new ArrayList<>();
+			for(int i=0;i<teachIds.size();++i)
+			{
+				int teachId=teachIds.get(i).getTeachId();
+				TeachInfo teachInfoCondition=new TeachInfo();
+				teachInfoCondition.setTeachId(teachId);
+				TeachInfo info=teachInfoService.getOne(Condition.getQueryWrapper(teachInfoCondition));
+				result.add(info);
+			}
+			return R.data(result);
+		}catch (Exception e){
+			return R.fail("机构账户不存在");
+		}
 	}
 
 	//===========================以下为自动生成的接口==============================
