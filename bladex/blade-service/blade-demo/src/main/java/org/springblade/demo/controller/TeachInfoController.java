@@ -193,6 +193,8 @@ public class TeachInfoController extends BladeController {
 			for(int i=0;i<teachIds.size();++i)
 			{
 				int teachId=teachIds.get(i).getTeachId();
+				int status=teachIds.get(i).getOrgTeachStatus();
+				if(status==3) continue;
 				TeachInfo teachInfoCondition=new TeachInfo();
 				teachInfoCondition.setTeachId(teachId);
 				TeachInfo info=teachInfoService.getOne(Condition.getQueryWrapper(teachInfoCondition));
@@ -214,10 +216,17 @@ public class TeachInfoController extends BladeController {
 	@ApiOperationSupport(order = 1)
 	@ApiOperation(value = "新增机构所属的教师（机构确认）", notes = "传入邮箱、账户名、机构账户名")
 	public  R<String> orgAddTeach(String mailbox,String setTeachAccount,String orgAccount) {
+		System.out.println("=============传入参数:"+mailbox+","+setTeachAccount+","+orgAccount+"============");
 		//根据机构名称获取机构id
 		OrgAccount orgAccountCondition=new OrgAccount();
 		orgAccountCondition.setOrgAccount(orgAccount);
-		OrgAccount orgAccount1=orgAccountService.getOne(Condition.getQueryWrapper(orgAccountCondition));
+		OrgAccount orgAccount1;
+		try{
+			orgAccount1 =orgAccountService.getOne(Condition.getQueryWrapper(orgAccountCondition));
+		}catch (Exception e){
+			System.out.println("后台异常：异常点1");
+			return  R.fail("后台异常：异常点1，请联系后台人员cyf");
+		}
 		int orgId;
 		try{
 			orgId=orgAccount1.getOrgId();
@@ -254,9 +263,15 @@ public class TeachInfoController extends BladeController {
 				return R.fail("添加教师账户失败！");
 			}
 			//查询添加的账户自动生成的教师id
-			TeachAccount teachAccountConditon=new TeachAccount();
-			teachAccountConditon.setTeachEmail(mailbox);
-			TeachAccount teachAccountDetail=teachAccountService.getOne(Condition.getQueryWrapper(teachAccountConditon));
+			TeachAccount teachAccountCondition2=new TeachAccount();
+			teachAccountCondition2.setTeachEmail(mailbox);
+			TeachAccount teachAccountDetail;
+			try{
+				teachAccountDetail=teachAccountService.getOne(Condition.getQueryWrapper(teachAccountCondition2));
+			}catch (Exception e){
+				System.out.println("后台异常：异常点2");
+				return  R.fail("后台异常：异常点2，请联系后台人员cyf");
+			}
 			teachId=teachAccountDetail.getTeachId();
 			//为教师信息在数据库中添加一个记录
 			TeachInfo teachInfo_new=new TeachInfo();
@@ -265,6 +280,7 @@ public class TeachInfoController extends BladeController {
 				R status=R.status(teachInfoService.save(teachInfo_new));
 				System.out.println(status);
 			}catch (Exception e){
+				System.out.println(e);
 				return R.fail("教师信息添加失败！");
 			}
 		}
@@ -272,11 +288,17 @@ public class TeachInfoController extends BladeController {
 			teachId=teachAccount.getTeachId();  //教师账户存在，说明教师个人信息也存在，直接添加机构教师关系记录
 		}
 		//判断教师机构关系中是否已经有此记录
-		RelOrgTeach relOrgTeach_exit_condition=new RelOrgTeach();
-		relOrgTeach_exit_condition.setOrgId(orgId);
-		relOrgTeach_exit_condition.setTeachId(teachId);
-		RelOrgTeach relOrgTeach_exit=relOrgTeachService.getOne(Condition.getQueryWrapper(relOrgTeach_exit_condition));
-		if(relOrgTeach_exit!=null) return R.fail("教师机构关系已存在！");
+		RelOrgTeach relOrgTeach_exist_condition=new RelOrgTeach();
+		relOrgTeach_exist_condition.setOrgId(orgId);
+		relOrgTeach_exist_condition.setTeachId(teachId);
+		RelOrgTeach relOrgTeach_exist;
+		try{
+			relOrgTeach_exist=relOrgTeachService.getOne(Condition.getQueryWrapper(relOrgTeach_exist_condition));
+		}catch (Exception e){
+			System.out.println("后台异常：异常点3");
+			return  R.fail("后台异常：异常点3，请联系后台人员cyf");
+		}
+		if(relOrgTeach_exist!=null) return R.fail("教师机构关系已存在！");
 		//将教师id加到rel_org_account中，设置状态为0
 		RelOrgTeach relOrgTeach_new=new RelOrgTeach();
 		relOrgTeach_new.setOrgId(orgId);

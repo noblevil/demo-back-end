@@ -339,6 +339,7 @@ public class CourseController extends BladeController {
  * @return
  */
 @JwtIgnore
+//	@Role(include = {RoleCode.ORG})
 @PostMapping("/addCourse")
 @ApiOperationSupport(order = 1)
 @ApiOperation(value = "根据机构账户名以及课程信息新增机构下属课程", notes = "传入机构账户orgAccount,课程信息")
@@ -385,6 +386,7 @@ public R add(@Valid @RequestBody JSONObject obj) {
 	 */
 
 	@JwtIgnore
+	//	@Role(include = {RoleCode.ORG})
 	@PostMapping("/deleteCourse")
 	@ApiOperationSupport(order = 1)
 	@ApiOperation(value = "根据机构账户名以及课程Id删除掉机构下属课程", notes = "传入机构账户orgAccount,课程号courseId")
@@ -408,6 +410,19 @@ public R add(@Valid @RequestBody JSONObject obj) {
 		return R.status(courseService.removeById(courseId));
 	}
 
+
+	/**
+	 * 修改 课程信息——7.13
+	 * http://localhost:9101/course/updateCourseInfo（以Requestbody方式传入信息）
+	 */
+	@JwtIgnore
+	//	@Role(include = {RoleCode.ORG})
+	@PostMapping("/updateCourseInfo")
+	@ApiOperationSupport(order = 5)
+	@ApiOperation(value = "修改课程信息", notes = "传入course")
+	public R updateCourseInfo(@Valid @RequestBody Course course) {
+		return R.status(courseService.updateById(course));
+	}
 
 	//===========================以下为自动生成的接口==============================
 
