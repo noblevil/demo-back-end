@@ -16,6 +16,7 @@
  */
 package org.springblade.demo.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.xiaoymin.knife4j.annotations.ApiOperationSupport;
 import io.swagger.annotations.Api;
@@ -31,10 +32,7 @@ import org.springblade.demo.annotation.JwtIgnore;
 import org.springblade.demo.annotation.Role;
 import org.springblade.demo.common.RoleCode;
 import org.springblade.demo.entity.*;
-import org.springblade.demo.service.ICourseService;
-import org.springblade.demo.service.IOrgInfoService;
-import org.springblade.demo.service.IRelOrgTeachService;
-import org.springblade.demo.service.ITeachAccountService;
+import org.springblade.demo.service.*;
 import org.springblade.demo.vo.OrgInfoVO;
 import org.springframework.web.bind.annotation.*;
 import sun.text.resources.no.CollationData_no;
@@ -61,7 +59,8 @@ public class OrgInfoController extends BladeController {
 	private ICourseService courseService;
 	private ITeachAccountService teachAccountService;
 	private IRelOrgTeachService relOrgTeachService;
-
+	private IOrgAccountService orgAccountService;
+	private IOrgQualifDataService orgQualifDataService;
 	/**
 	 * 根据机构id获取机构信息详情
 	 * 例如：http://localhost:9101/orginfo/getOrgDetailById?orgId=2
@@ -226,6 +225,124 @@ public class OrgInfoController extends BladeController {
 		return R.data(list);
 	}
 
+
+	/**
+	 * ybj	7.13
+	 * 机构
+	 * 根据orgAccount获取机构信息、机构账户、机构资质材料信息
+	 * Request Example：http://localhost:9101/orginfo/getOrgInfo?orgAccount=1101234561
+	 * @param orgAccount
+	 * @return
+	 */
+	@JwtIgnore
+//	@Role(include = {RoleCode.ORG})
+	@ApiOperationSupport(order = 1)
+	@ApiOperation(value="获取机构信息、机构账户、机构资质材料信息",notes="传入机构账户orgAccount")
+	@GetMapping("/getOrgInfo")
+	public R<JSONObject> getOrgInfo(String orgAccount){
+		//根据机构账户名得到机构id
+		OrgAccount orgAccountCondition = new OrgAccount();
+		orgAccountCondition.setOrgAccount(orgAccount);
+		int orgId;
+		try{
+			orgId = orgAccountService.getOne(Condition.getQueryWrapper(orgAccountCondition)).getOrgId();
+		}catch (Exception e){
+			return R.fail("机构不存在!");
+		}
+		JSONObject obj = new JSONObject();
+		//根据orgId获取三个表的信息，存入JSONObject对象
+		OrgInfo orgInfo = new OrgInfo();
+		orgInfo.setOrgId(orgId);
+		obj.put("orgInfo", orgInfoService.getOne(Condition.getQueryWrapper(orgInfo)));
+
+		OrgAccount orgAcc = new OrgAccount();
+		orgAcc.setOrgId(orgId);
+		obj.put("orgAccount", orgAccountService.getOne(Condition.getQueryWrapper(orgAcc)));
+
+		OrgQualifData orgQualifData = new OrgQualifData();
+		orgQualifData.setOrgId(orgId);
+		obj.put("orgQualifData", orgQualifDataService.getOne(Condition.getQueryWrapper(orgQualifData)));
+		return R.data(obj);
+	}
+
+
+	/**
+	 * ybj	7.13
+	 * 机构
+	 *根据orgAccount对机构账户相关信息(orgPhone,passwd)进行修改，更新到数据库机构账户表中
+	 * Request Example：http://localhost:9101/orginfo/UpdateOrgAccountInfo?+(Body)
+	 * @param obj
+	 * @return
+	 */
+	@JwtIgnore
+//	@Role(include = {RoleCode.ORG})
+	@ApiOperationSupport(order = 2)
+	@ApiOperation(value="",notes="")
+	@PostMapping("/UpdateOrgAccountInfo")
+	public R UpdateOrgAccountInfo(@Valid @RequestBody JSONObject obj){
+		//根据orgAccount得到orgId
+		System.out.println(obj);
+		String orgAccount = obj.getString("orgAccount");
+		OrgAccount orgAcc = new OrgAccount();
+		orgAcc.setOrgAccount(orgAccount);
+		int orgId;
+		try {
+			orgId = orgAccountService.getOne(Condition.getQueryWrapper(orgAcc)).getOrgId();
+		}catch (Exception e){
+			return R.fail("机构不存在!");
+		}
+		//获取机构账户信息并修改
+		OrgAccount orgAccountCondition = new OrgAccount();
+		orgAccountCondition = orgAccountService.getOne(Condition.getQueryWrapper(orgAcc));
+		if(orgAccountCondition.getPasswd() == obj.getString("passwd"))
+		{
+			return R.fail("新密码不能与旧密码相同!");
+		}
+		if(orgAccountCondition.getOrgPhone() == obj.getString("orgPhone"))
+		{
+			return R.fail("新手机号码不能与旧手机号码相同!");
+		}
+		orgAccountCondition.setOrgPhone(obj.getString("orgPhone"));
+		orgAccountCondition.setPasswd(obj.getString("passwd"));
+		return R.data(orgAccountService.updateById(orgAccountCondition));
+	}
+
+
+	/**
+	 * ybj 7.13
+	 * 机构
+	 * 根据orgAccount修改机构信息（linkmanOne,linkmanOnePhone,linkmanTwo,linkmanTwoPhone），更新数据到机构信息表
+	 * Request Example：http://localhost:9101/orginfo/UpdateOrgInfo?+(Body)
+	 * @param obj
+	 * @return
+	 */
+	@JwtIgnore
+//	@Role(include = {RoleCode.ORG})
+	@ApiOperationSupport(order = 3)
+	@ApiOperation(value="",notes="")
+	@PostMapping("/UpdateOrgInfo")
+	public R UpdateOrgInfo(@Valid @RequestBody JSONObject obj){
+		String orgAccount = obj.getString("orgAccount");
+		OrgAccount orgAccountCondition = new OrgAccount();
+		orgAccountCondition.setOrgAccount(orgAccount);
+		//orgId
+		int orgId;
+		try{
+			orgId = orgAccountService.getOne(Condition.getQueryWrapper(orgAccountCondition)).getOrgId();
+		}catch (Exception e){
+			return R.fail("机构不存在!");
+		}
+		//根据orgId获取机构信息
+		OrgInfo orgInfoCondition = new OrgInfo();
+		orgInfoCondition.setOrgId(orgId);
+		OrgInfo orgInfo = new OrgInfo();
+		orgInfo = orgInfoService.getOne(Condition.getQueryWrapper(orgInfoCondition));
+		orgInfo.setLinkmanOne(obj.getString("linkmanOne"));
+		orgInfo.setLinkmanOne(obj.getString("linkmanOnePhone"));
+		orgInfo.setLinkmanOne(obj.getString("linkmanTwo"));
+		orgInfo.setLinkmanOne(obj.getString("linkmanTwoPhone"));
+		return R.status(orgInfoService.updateById(orgInfo));
+	}
 
 	//===========================以下为自动生成的接口==============================
 
