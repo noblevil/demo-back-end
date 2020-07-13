@@ -327,7 +327,7 @@ public class CourseController extends BladeController {
     return R.data(courseService.list(Condition.getQueryWrapper(course)));
  }
 
-//-------------------------------------------7.12----------------------------------
+
 
 /**
  *  ybj	7.12
@@ -376,6 +376,37 @@ public R add(@Valid @RequestBody JSONObject obj) {
 	return R.status(courseService.save(course));
 
 }
+
+
+	/**
+	 * ybj 7.12
+	 * 删除机构下属的课程信息
+	 *http://localhost:9101/course/deleteCourse?orgAccount=1101234561&courseId=101
+	 */
+
+	@JwtIgnore
+	@PostMapping("/deleteCourse")
+	@ApiOperationSupport(order = 1)
+	@ApiOperation(value = "根据机构账户名以及课程Id删除掉机构下属课程", notes = "传入机构账户orgAccount,课程号courseId")
+	public R delete(String orgAccount, Integer courseId) {
+		//根据orgAccount找到orgId
+		OrgAccount orgAccountCondtion = new OrgAccount();
+		orgAccountCondtion.setOrgAccount(orgAccount);
+		int orgId;
+		try {
+			orgId = orgAccountService.getOne(Condition.getQueryWrapper(orgAccountCondtion)).getOrgId();
+		}
+		catch (Exception e) {
+			return R.fail("机构账户不存在");
+		}
+		//根据orgId找到courseList
+		Course course = new Course();
+		course.setOrgId(orgId);
+		List<Course> courseList = new ArrayList<>();
+		courseList = courseService.list(Condition.getQueryWrapper(course));
+		//删除courseList中对应的courseId项
+		return R.status(courseService.removeById(courseId));
+	}
 
 
 	//===========================以下为自动生成的接口==============================

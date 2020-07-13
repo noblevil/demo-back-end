@@ -43,6 +43,7 @@ import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * 机构信息  控制器
@@ -182,6 +183,47 @@ public class OrgInfoController extends BladeController {
 			orgInfoList.add(orgInfoDetail);
 		}
 		return R.data(orgInfoList);
+	}
+
+
+	/**
+	 * ybj
+	 * http://localhost:9101/orginfo/searchOrg?condition=机构名或机构id
+	 * 筛选：根据机构名搜索机构——7.12
+	 *
+	 */
+	@JwtIgnore
+//	@Role(include = {RoleCode.TEACH})
+	@GetMapping("/searchOrg")
+	@ApiOperationSupport(order = 1)
+	@ApiOperation(value = "条件查询：获取机构所属的课程名", notes = "传入机构名")
+	public  R<List<OrgInfo>> queryOrgInfo(String condition) {
+		//Course courseCondition=new Course();
+		OrgInfo orgInfoCondition = new OrgInfo();
+		Pattern pattern = Pattern.compile("[0-9]*");
+		boolean type=pattern.matcher(condition).matches();  //用正则表达式判断传入的参数类型，若为数字，返回true
+		if(type) {  //数字类型
+			Integer orgId = Integer.valueOf(condition);
+			System.out.println("传入机构id=" + orgId);
+			orgInfoCondition.setOrgId(orgId);  //设置筛选条件
+		}
+		else {
+			//根据机构名获取机构id
+			OrgInfo orgCondition=new OrgInfo();  //筛选条件
+			orgCondition.setOrgName(condition);
+			OrgInfo orgInfo=orgInfoService.getOne(Condition.getQueryWrapper(orgCondition));
+			try{
+				Integer orgId=orgInfo.getOrgId();
+				orgInfoCondition.setOrgId(orgId);
+			}
+			catch (Exception e){
+				return R.fail("机构账户不存在");
+//				return R.data(200,null,"机构账户不存在");
+			}
+		}
+		//获取机构所属的所有课程信息
+		List<OrgInfo> list = orgInfoService.list(Condition.getQueryWrapper(orgInfoCondition));
+		return R.data(list);
 	}
 
 
