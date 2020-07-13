@@ -31,22 +31,19 @@ import org.springblade.core.tool.utils.Func;
 import org.springblade.demo.annotation.JwtIgnore;
 import org.springblade.demo.annotation.Role;
 import org.springblade.demo.common.RoleCode;
-import org.springblade.demo.entity.OrgAccount;
-import org.springblade.demo.entity.RelOrgTeach;
-import org.springblade.demo.entity.TeachAccount;
-import org.springblade.demo.service.IOrgAccountService;
-import org.springblade.demo.service.IRelOrgTeachService;
-import org.springblade.demo.service.ITeachAccountService;
+import org.springblade.demo.entity.*;
+import org.springblade.demo.service.*;
 import org.springframework.web.bind.annotation.*;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import org.springblade.demo.entity.TeachInfo;
 import org.springblade.demo.vo.TeachInfoVO;
-import org.springblade.demo.service.ITeachInfoService;
 import org.springblade.core.boot.ctrl.BladeController;
 import sun.text.resources.no.CollationData_no;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 /**
  * 教师信息  控制器
@@ -64,6 +61,7 @@ public class TeachInfoController extends BladeController {
 	private IRelOrgTeachService relOrgTeachService;
 	private ITeachAccountService teachAccountService;
 	private IOrgAccountService orgAccountService;
+	private IOrgInfoService orgInfoService;
 
 	/**
 	 * 根据机构id获取所属的教师列表
@@ -146,7 +144,7 @@ public class TeachInfoController extends BladeController {
 //	@Role(include = {RoleCode.TEACH})
 	@GetMapping("/getProfile")
 	@ApiOperationSupport(order = 1)
-	@ApiOperation(value = "条件查询：获取教师信息详情", notes = "传入教师账户名")
+	@ApiOperation(value = "根据teachAccount获取教师基本信息", notes = "传入教师账户名")
 	public R<JSONObject> getProfile(String teachAccount) {
 		TeachAccount teachAccountCondition=new TeachAccount();
 		teachAccountCondition.setTeachAccount(teachAccount);
@@ -206,6 +204,218 @@ public class TeachInfoController extends BladeController {
 		}
 	}
 
+	/**
+	 * 新增机构所属的教师（机构确认：状态设为0）——7.12
+	 * http://localhost:9101/teachinfo/orgAddTeach?mailbox=1234567890@qq.com&setTeachAccount=10086&orgAccount=1101234563
+	 */
+	@JwtIgnore
+//	@Role(include = {RoleCode.ORG})
+	@PostMapping("/orgAddTeach")
+	@ApiOperationSupport(order = 1)
+	@ApiOperation(value = "新增机构所属的教师（机构确认）", notes = "传入邮箱、账户名、机构账户名")
+	public  R<String> orgAddTeach(String mailbox,String setTeachAccount,String orgAccount) {
+		//根据机构名称获取机构id
+		OrgAccount orgAccountCondition=new OrgAccount();
+		orgAccountCondition.setOrgAccount(orgAccount);
+		OrgAccount orgAccount1=orgAccountService.getOne(Condition.getQueryWrapper(orgAccountCondition));
+		int orgId;
+		try{
+			orgId=orgAccount1.getOrgId();
+		}catch (Exception e){
+			return R.fail("机构不存在！");
+		}
+		//查询数据库是否已有该邮箱（即：教师是否已注册）
+		int teachId;
+		TeachAccount teachAccountCondition=new TeachAccount();
+		teachAccountCondition.setTeachEmail(mailbox);
+		TeachAccount teachAccount=teachAccountService.getOne(Condition.getQueryWrapper(teachAccountCondition));
+		if(teachAccount==null){  //教师未注册账户
+			//判断账户名是否已被使用
+			List<String> teachAccountALL=new ArrayList<>();
+			List<TeachAccount> teachAccounts=teachAccountService.list(Condition.getQueryWrapper(null));
+			for(int i=0;i<teachAccounts.size();++i){
+				teachAccountALL.add(teachAccounts.get(i).getTeachAccount());
+			}
+			System.out.println(teachAccountALL);
+			if(teachAccountALL.contains(setTeachAccount)){
+				return R.fail("账户名已存在！");
+			}
+			//为教师创建账户（默认密码：123456）
+			TeachAccount teachAccount_new=new TeachAccount();
+			teachAccount_new.setTeachAccount(setTeachAccount);  //根据传入的账户名设置自定义账户名
+			teachAccount_new.setTeachEmail(mailbox);  //设置邮箱
+			teachAccount_new.setPasswd("123456");
+			LocalDateTime nowTime=LocalDateTime.now();
+			teachAccount_new.setCreateTime(nowTime);
+			try{
+				R status=R.status(teachAccountService.save(teachAccount_new));
+				System.out.println(status);  //测试账户信息添加状态
+			}catch (Exception e){
+				return R.fail("添加教师账户失败！");
+			}
+			//查询添加的账户自动生成的教师id
+			TeachAccount teachAccountConditon=new TeachAccount();
+			teachAccountConditon.setTeachEmail(mailbox);
+			TeachAccount teachAccountDetail=teachAccountService.getOne(Condition.getQueryWrapper(teachAccountConditon));
+			teachId=teachAccountDetail.getTeachId();
+			//为教师信息在数据库中添加一个记录
+			TeachInfo teachInfo_new=new TeachInfo();
+			teachInfo_new.setTeachId(teachId);
+			try{
+				R status=R.status(teachInfoService.save(teachInfo_new));
+				System.out.println(status);
+			}catch (Exception e){
+				return R.fail("教师信息添加失败！");
+			}
+		}
+		else{  //已注册账户，直接获取教师id添加到rel_org_account中，设置状态为0
+			teachId=teachAccount.getTeachId();  //教师账户存在，说明教师个人信息也存在，直接添加机构教师关系记录
+		}
+		//判断教师机构关系中是否已经有此记录
+		RelOrgTeach relOrgTeach_exit_condition=new RelOrgTeach();
+		relOrgTeach_exit_condition.setOrgId(orgId);
+		relOrgTeach_exit_condition.setTeachId(teachId);
+		RelOrgTeach relOrgTeach_exit=relOrgTeachService.getOne(Condition.getQueryWrapper(relOrgTeach_exit_condition));
+		if(relOrgTeach_exit!=null) return R.fail("教师机构关系已存在！");
+		//将教师id加到rel_org_account中，设置状态为0
+		RelOrgTeach relOrgTeach_new=new RelOrgTeach();
+		relOrgTeach_new.setOrgId(orgId);
+		relOrgTeach_new.setTeachId(teachId);
+		relOrgTeach_new.setOrgTeachStatus(0);  //机构单方面确认
+		R status_OT=R.status(relOrgTeachService.save(relOrgTeach_new));
+		System.out.println(status_OT);
+		return R.success("教师添加到机构成功！");
+	}
+
+
+	/**
+	 * 删除机构下属教师（将教师设为离职状态（3））——7.12
+	 * http://localhost:9101/teachinfo/orgRemoveTeach?orgAccount=1101234563&teachId=3
+	 */
+	@JwtIgnore
+//	@Role(include = {RoleCode.ORG})
+	@PostMapping("/orgRemoveTeach")
+	@ApiOperationSupport(order = 1)
+	@ApiOperation(value = "教师从机构离职", notes = "传入机构账户名、教师id")
+	public  R<String> orgRemoveTeach(String orgAccount,int teachId) {
+		//根据机构账户名获取机构id
+		OrgAccount orgAccountCondition=new OrgAccount();
+		orgAccountCondition.setOrgAccount(orgAccount);
+		OrgAccount orgAccount1=orgAccountService.getOne(Condition.getQueryWrapper(orgAccountCondition));
+		int orgId;
+		try{
+			orgId=orgAccount1.getOrgId();
+		}catch (Exception e){
+			return R.fail("机构不存在！");
+		}
+		//根据机构id、教师id获取rel_org_teach指定的记录
+		RelOrgTeach relOrgTeach=new RelOrgTeach();
+		relOrgTeach.setOrgId(orgId);
+		relOrgTeach.setTeachId(teachId);
+		RelOrgTeach relOrgTeach_modify=relOrgTeachService.getOne(Condition.getQueryWrapper(relOrgTeach));
+		System.out.println(relOrgTeach_modify);
+		if(relOrgTeach_modify==null){
+			return R.fail("教师id不存在！");
+		}
+		else{
+			relOrgTeach_modify.setOrgTeachStatus(3);  //状态3表示教师从机构离职
+			System.out.println(relOrgTeach_modify);
+			relOrgTeachService.updateById(relOrgTeach_modify);
+		}
+		return R.success("教师从机构离职成功!");
+	}
+//	/**
+//	 * 更新rel_org_teach==>测试！！
+//	 * http://localhost:9101/teachinfo/orgRemoveTeach?orgName=小神童&teachId=3
+//	 */
+//	@JwtIgnore
+////	@Role(include = {RoleCode.ORG})
+//	@PostMapping("/orgTeachUpdate")
+//	@ApiOperationSupport(order = 1)
+//	@ApiOperation(value = "教师从机构离职", notes = "传入机构id、教师id")
+//	public  R<String> orgTeachUpdate(int orgId,int teachId) {
+//		RelOrgTeach relOrgTeach=new RelOrgTeach();
+//		relOrgTeach.setOrgId(orgId);
+//		relOrgTeach.setTeachId(teachId);
+//		RelOrgTeach relOrgTeach_modify;
+//		try{
+//			relOrgTeach_modify=relOrgTeachService.getOne(Condition.getQueryWrapper(relOrgTeach));
+//		}catch (Exception e){
+//			return R.fail("找不到此机构与教师的关系！");
+//		}
+//		System.out.println(relOrgTeach_modify);
+//		relOrgTeach_modify.setOrgTeachStatus(3);
+//		//更新信息
+//		relOrgTeachService.updateById(relOrgTeach_modify);
+//
+//		return R.success("教师从机构离职成功!");
+//	}
+
+	/**
+	 * 传入教师id、机构id和状态，修改教师与机构间的状态——7.13
+	 * http://localhost:9101/teachinfo/changeOrgTeachStatus?teachId=1&orgId=1&orgTeachStatus=1
+	 */
+	@JwtIgnore
+//	@Role(include = {RoleCode.ORG})
+	@PostMapping("/changeOrgTeachStatus")
+	@ApiOperationSupport(order = 1)
+	@ApiOperation(value = "传入教师id、机构id和状态，修改教师与机构间的状态", notes = "传入teachId、orgId和orgTeachStatus")
+	public  R<String> orgRemoveTeach(int teachId,int orgId,int orgTeachStatus) {
+		//根据教师id和机构id获取相应记录
+		RelOrgTeach relOrgTeach=new RelOrgTeach();
+		relOrgTeach.setTeachId(teachId);
+		relOrgTeach.setOrgId(orgId);
+		//判断机构教师关系是否存在
+		RelOrgTeach relOrgTeachModify;
+		try{
+			relOrgTeachModify=relOrgTeachService.getOne(Condition.getQueryWrapper(relOrgTeach));
+		}
+		catch (Exception e){
+			return R.fail("教师关系信息不存在！");
+		}
+		relOrgTeachModify.setOrgTeachStatus(orgTeachStatus);
+		return R.status(relOrgTeachService.updateById(relOrgTeachModify));
+	}
+
+	  /**
+  * ybj 7.12
+  * 修改机构下属教师信息
+  * @param teachInfo
+  * http://localhost:9101/teachinfo/updateOrgTeacher/
+  * @return
+  */
+ @JwtIgnore
+ // @Role(include = {RoleCode.ORG})
+ @PostMapping("/updateOrgTeacher")
+ @ApiOperationSupport(order = 5)
+ @ApiOperation(value = "修改", notes = "传入teachInfo")
+ public R<List<TeachInfo>> updateOrgTeacher(String orgName, TeachInfo teachInfo) {
+    //更新教师信息
+    TeachInfo teachInfoCondition = new TeachInfo();
+    teachInfoService.updateById(teachInfo);
+    //根据orgName获取orgId
+    OrgInfo orgInfo = new OrgInfo();
+    orgInfo.setOrgName(orgName);
+    int orgId;
+    try{
+       orgId = orgInfoService.getOne(Condition.getQueryWrapper(orgInfo)).getOrgId();
+    }catch (Exception e){
+       return R.fail("机构不存在");
+    }
+    //根据orgId查找机构下所有教师Id
+    RelOrgTeach relOrgTeach = new RelOrgTeach();
+    relOrgTeach.setOrgId(orgId);
+    List<RelOrgTeach> relOrgTeachList = relOrgTeachService.list(Condition.getQueryWrapper(relOrgTeach));
+    //查找机构下所有教师信息
+    List<TeachInfo> list = new ArrayList<>();
+    for(int i=0;i<relOrgTeachList.size();++i)
+    {
+       int teachId = relOrgTeachService.getOne(Condition.getQueryWrapper(relOrgTeachList.get(i))).getTeachId();
+       list.add(teachInfoService.getById(teachId));
+    }
+    return R.data(list);
+ }
+
 	//===========================以下为自动生成的接口==============================
 	/**
 	 * 详情
@@ -245,16 +455,18 @@ public class TeachInfoController extends BladeController {
 	/**
 	 * 新增 教师信息
 	 */
+	@JwtIgnore
 	@PostMapping("/save")
 	@ApiOperationSupport(order = 4)
 	@ApiOperation(value = "新增", notes = "传入teachInfo")
-	public R save(@Valid @RequestBody TeachInfo teachInfo) {
+	public R save(TeachInfo teachInfo) {
 		return R.status(teachInfoService.save(teachInfo));
 	}
 
 	/**
 	 * 修改 教师信息
 	 */
+	@JwtIgnore
 	@PostMapping("/update")
 	@ApiOperationSupport(order = 5)
 	@ApiOperation(value = "修改", notes = "传入teachInfo")
@@ -265,6 +477,7 @@ public class TeachInfoController extends BladeController {
 	/**
 	 * 新增或修改 教师信息
 	 */
+	@JwtIgnore
 	@PostMapping("/submit")
 	@ApiOperationSupport(order = 6)
 	@ApiOperation(value = "新增或修改", notes = "传入teachInfo")

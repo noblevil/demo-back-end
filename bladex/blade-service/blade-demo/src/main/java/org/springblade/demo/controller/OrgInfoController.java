@@ -28,13 +28,16 @@ import org.springblade.core.mp.support.Query;
 import org.springblade.core.tool.api.R;
 import org.springblade.core.tool.utils.Func;
 import org.springblade.demo.annotation.JwtIgnore;
-import org.springblade.demo.entity.Course;
-import org.springblade.demo.entity.OrgInfo;
-import org.springblade.demo.entity.RelOrgTeach;
+import org.springblade.demo.annotation.Role;
+import org.springblade.demo.common.RoleCode;
+import org.springblade.demo.entity.*;
 import org.springblade.demo.service.ICourseService;
 import org.springblade.demo.service.IOrgInfoService;
+import org.springblade.demo.service.IRelOrgTeachService;
+import org.springblade.demo.service.ITeachAccountService;
 import org.springblade.demo.vo.OrgInfoVO;
 import org.springframework.web.bind.annotation.*;
+import sun.text.resources.no.CollationData_no;
 
 import javax.validation.Valid;
 import java.util.ArrayList;
@@ -55,10 +58,12 @@ public class OrgInfoController extends BladeController {
 
 	private IOrgInfoService orgInfoService;
 	private ICourseService courseService;
+	private ITeachAccountService teachAccountService;
+	private IRelOrgTeachService relOrgTeachService;
 
 	/**
 	 * 根据机构id获取机构信息详情
-	 * 例如：http://localhost:9101/orginfo/getOrgDetailById?id=2
+	 * 例如：http://localhost:9101/orginfo/getOrgDetailById?orgId=2
 	 */
 	@JwtIgnore
 	@GetMapping("/getOrgDetailById")  //【API-1】
@@ -86,7 +91,7 @@ public class OrgInfoController extends BladeController {
 	}
 
 	/**
-	 * 分页（第几页，每页多少条数据） 查询所有机构信息，
+	 * 分页（第几页，每页多少条数据） 查询所有机构信息
 	 * 例如：http://localhost:9101/orginfo/getAllOrgListByPage?current=2&size=1（第二页，每页1条信息）
 	 */
 	@JwtIgnore
@@ -141,13 +146,44 @@ public class OrgInfoController extends BladeController {
 			list = returnList;
 
 		}
-
-
-
-
-
 		return R.data(list);
 	}
+
+	/**
+	 * 获取教师所属的所有机构的信息——7.13
+	 * http://localhost:9101/orginfo/getOrgByTeachAccount?teachAccount=110
+	 */
+	@JwtIgnore
+//	@Role(include = {RoleCode.TEACH})
+	@GetMapping("/getOrgByTeachAccount")
+	@ApiOperationSupport(order = 1)
+	@ApiOperation(value = "根据教师账户名获取教师所属的所有机构信息", notes = "传入教师账户名")
+	public  R<List<OrgInfo>> getOrgByTeachAccount(String teachAccount) {
+		TeachAccount teachAccountCondition=new TeachAccount();
+		teachAccountCondition.setTeachAccount(teachAccount);
+		TeachAccount teachAccountInfo=teachAccountService.getOne(Condition.getQueryWrapper(teachAccountCondition));
+		//获得教师账户名
+		int teachId;
+		try{
+			teachId=teachAccountInfo.getTeachId();
+		}catch (Exception e){
+			return R.fail("此教师账户名不存在！");
+		}
+		//查询rel_org_teach获取教师所属的全部机构id
+		RelOrgTeach relOrgTeachCondition=new RelOrgTeach();
+		relOrgTeachCondition.setTeachId(teachId);
+		List<RelOrgTeach> relOrgTeachesList=relOrgTeachService.list(Condition.getQueryWrapper(relOrgTeachCondition));
+		//遍历获取机构id，得到机构详情列表
+		List<OrgInfo> orgInfoList=new ArrayList<>();
+		for(int i=0;i<relOrgTeachesList.size();++i){
+			OrgInfo orgInfoCondition=new OrgInfo();
+			orgInfoCondition.setOrgId(relOrgTeachesList.get(i).getOrgId());
+			OrgInfo orgInfoDetail=orgInfoService.getOne(Condition.getQueryWrapper(orgInfoCondition));
+			orgInfoList.add(orgInfoDetail);
+		}
+		return R.data(orgInfoList);
+	}
+
 
 	//===========================以下为自动生成的接口==============================
 
