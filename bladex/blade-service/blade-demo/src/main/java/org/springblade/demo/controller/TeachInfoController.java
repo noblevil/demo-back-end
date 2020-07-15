@@ -16,6 +16,7 @@
  */
 package org.springblade.demo.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -41,6 +42,7 @@ import sun.text.resources.no.CollationData_no;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -438,6 +440,82 @@ public class TeachInfoController extends BladeController {
     return R.data(list);
  }
 
+
+	/**
+	 * ybj 7.14
+	 * 根据teachAccount修改教师账户和教师信息
+	 * Request Example:http://localhost:9101/teachinfo/changeTeachByTeachAccount +请求体
+	 * @param Params
+	 * @return
+	 */
+	@JwtIgnore
+//	@Role(include = {RoleCode.TEACH})
+	@ApiOperationSupport(order = 2)
+	@ApiOperation(value="",notes="传入teachId,teachAccount,teachInfo")
+	@PostMapping("/changeTeachByTeachAccount")
+	public R changeTeachByTeachAccount(@Valid @RequestBody String Params){
+		//根据teachAccount找到teachId
+		System.out.println("请求体内容:\n"+ Params);
+
+
+		JSONObject obj = JSON.parseObject(Params);
+		Integer teachId = obj.getInteger("teachId");
+		JSONObject tcobj = (JSONObject)obj.get("teachAccount");
+		JSONObject tfobj = (JSONObject)obj.get("teachInfo");
+		TeachAccount teachAcc = new TeachAccount();
+		teachAcc.setTeachId(teachId);
+
+		TeachAccount teachAccountCondition;
+		teachAccountCondition = teachAccountService.getOne(Condition.getQueryWrapper(teachAcc));
+		TeachInfo teachInfo = new TeachInfo();
+		TeachInfo teachIn;
+		teachInfo.setTeachId(teachId);
+		teachIn = teachInfoService.getOne(Condition.getQueryWrapper(teachInfo));
+
+		//更新教师账户信息
+		teachAccountCondition.setTeachId(tcobj.getInteger("teachId"));
+		teachAccountCondition.setTeachAccount(tcobj.getString("teachAccount"));
+		teachAccountCondition.setPasswd(tcobj.getString("passwd"));
+		teachAccountCondition.setTeachEmail(tcobj.getString("teachEmail"));
+		teachAccountCondition.setTeachPhone(tcobj.getString("teachPhone"));
+
+		String time = tcobj.getString("createTime");
+		time = time.replace('T',' ');
+		DateTimeFormatter fmt1 = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+		//LocalDateTime createTime = LocalDateTime.parse(tcobj.getString("createTime"),fmt1);
+		LocalDateTime createTime = LocalDateTime.parse(time,fmt1);
+		
+		teachAccountCondition.setCreateTime(createTime);
+
+		//更新教师个人信息
+		teachIn.setTeachId(tfobj.getInteger("teachId"));
+		teachIn.setTeachName(tfobj.getString("teachName"));
+		teachIn.setSex(tfobj.getString("sex"));
+		teachIn.setTeachingSubject(tfobj.getString("teachingSubject"));
+		teachIn.setIsTeachQualifCert(tfobj.getString("isTeachQualifCert"));
+		teachIn.setTeachQualifClass(tfobj.getString("teachQualifClass"));
+		teachIn.setCertificateNum(tfobj.getString("certificateNum"));
+		teachIn.setProfessionalTitle(tfobj.getString("professionTitle"));
+		teachIn.setCountryNature(tfobj.getString("countryNature"));
+		teachIn.setNationality(tfobj.getString("highestEducation"));
+		teachIn.setHighestEducation(tfobj.getString("highestEducation"));
+		teachIn.setEducationalInstitution(tfobj.getString("educationalInstitution"));
+		teachIn.setHighestDegree(tfobj.getString("highestDegree"));
+		teachIn.setDegreeObtainedInstitution(tfobj.getString("degreeObtainedInstitution"));
+		teachIn.setMajor(tfobj.getString("major"));
+		teachIn.setWorkType(tfobj.getString("workType"));
+		teachIn.setIdNum(tfobj.getString("idNum"));
+		teachIn.setNativePlace(tfobj.getString("nativePlace"));
+		teachIn.setPoliticalStatus(tfobj.getString("politicalStatus"));
+
+		//json->LocalDate 日期处理
+		DateTimeFormatter fmt2 = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+		LocalDate birthdate = LocalDate.parse(tfobj.getString("teachBirth"),fmt2);
+		teachIn.setTeachBirth(birthdate);
+		LocalDate graduatedate= LocalDate.parse(tfobj.getString("graduationDate"),fmt2);
+		teachIn.setGraduationDate(graduatedate);
+		return R.status(teachAccountService.updateById(teachAccountCondition)&&teachInfoService.updateById(teachIn));
+	}
 	//===========================以下为自动生成的接口==============================
 	/**
 	 * 详情

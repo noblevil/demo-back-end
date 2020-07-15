@@ -16,6 +16,7 @@
  */
 package org.springblade.demo.entity;
 
+import com.baomidou.mybatisplus.annotation.TableId;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -38,6 +39,7 @@ public class OrgQualifData implements Serializable {
 	* 机构ID 机构标识符
 	*/
 		@ApiModelProperty(value = "机构ID 机构标识符")
+
 		private Integer orgId;
 	/**
 	* 法人姓名

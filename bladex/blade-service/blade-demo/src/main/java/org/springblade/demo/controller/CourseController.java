@@ -16,6 +16,8 @@
  */
 package org.springblade.demo.controller;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.mysql.cj.exceptions.ClosedOnExpiredPasswordException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -28,7 +30,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.aspectj.weaver.patterns.IToken;
-import org.json.JSONObject;
 import org.springblade.core.mp.support.Condition;
 import org.springblade.core.mp.support.Query;
 import org.springblade.core.tool.api.R;
@@ -329,54 +330,56 @@ public class CourseController extends BladeController {
 
 
 
-/**
- *  ybj	7.12
- * 新增机构下属的课程信息
- * http://localhost:9101/orgaccount/course?orgAccount=1101234561&课程信息
- *http://localhost:9101/orgaccount/course?orgAccount=1101234561&courseName=线性代数3&courseSubject=理科&courseLevel=大学&courseLink=无&contentIntro=就是数学课&validPeriod=1年&studentRank=大学&totalLessons=48学时&textbook=无&publishCompany=无&studentGrade=大学一年级&isbnNumber=无
- *
- * @param obj
- * @return
- */
-@JwtIgnore
-//	@Role(include = {RoleCode.ORG})
-@PostMapping("/addCourse")
-@ApiOperationSupport(order = 1)
-@ApiOperation(value = "根据机构账户名以及课程信息新增机构下属课程", notes = "传入机构账户orgAccount,课程信息")
-public R add(@Valid @RequestBody JSONObject obj) {
-	//System.out.println(obj.get("orgAccount"));
-	//System.out.println(obj);
-	OrgAccount orgAccountCondition = new OrgAccount();
-	orgAccountCondition.setOrgAccount((obj.getString("orgAccount")));
-	int orgId;
-	try {
-		orgId = orgAccountService.getOne(Condition.getQueryWrapper(orgAccountCondition)).getOrgId();
-	}
-	catch (Exception e)
-	{
-		return R.fail("机构不存在");
-	}
-	//设定机构id
-	Course course = new Course();
-	course.setOrgId(orgId);
-	//obj.remove("orgAccount");
-	//System.out.println(obj);
-	//解析对象
-	course.setCourseName(obj.getString("courseName"));
-	course.setCourseSubject(obj.getString("courseSubject"));
-	course.setCourseLevel(obj.getString("courseLevel"));
-	course.setCourseLink(obj.getString("courseLink"));
-	course.setContentIntro(obj.getString("contentIntro"));
-	course.setValidPeriod(obj.getString("validPeriod"));
-	course.setStudentRank(obj.getString("studentRand"));
-	course.setStudentGrade(obj.getString("studentGrade"));
-	course.setTotalLessons(obj.getString("totalLessons"));
-	course.setTextbook(obj.getString("textbook"));
-	course.setPublishCompany(obj.getString("publishCompany"));
-	course.setIsbnNumber(obj.getString("isbnNumber"));
-	return R.status(courseService.save(course));
 
-}
+	/**
+	 *  ybj	7.12
+	 * 新增机构下属的课程信息
+	 * http://localhost:9101/orgaccount/course?orgAccount=1101234561&课程信息
+	 *http://localhost:9101/orgaccount/course?orgAccount=1101234561&courseName=线性代数3&courseSubject=理科&courseLevel=大学&courseLink=无&contentIntro=就是数学课&validPeriod=1年&studentRank=大学&totalLessons=48学时&textbook=无&publishCompany=无&studentGrade=大学一年级&isbnNumber=无
+	 *
+	 * @param params
+	 * @return
+	 */
+	@JwtIgnore
+//	@Role(include = {RoleCode.ORG})
+	@PostMapping("/addCourse")
+	@ApiOperationSupport(order = 1)
+	@ApiOperation(value = "根据机构账户名以及课程信息新增机构下属课程", notes = "传入机构账户orgAccount,课程信息")
+	public R add(@Valid @RequestBody String params) {
+
+		JSONObject obj = JSON.parseObject(params);
+		OrgAccount orgAccountCondition = new OrgAccount();
+		orgAccountCondition.setOrgAccount((obj.getString("orgAccount")));
+		int orgId;
+		try {
+			orgId = orgAccountService.getOne(Condition.getQueryWrapper(orgAccountCondition)).getOrgId();
+		}
+		catch (Exception e)
+		{
+			return R.fail("机构不存在");
+		}
+		//设定机构id
+		Course course = new Course();
+		course.setOrgId(orgId);
+		//obj.remove("orgAccount");
+		//System.out.println(obj);
+		//解析对象
+		course.setCourseName(obj.getString("courseName"));
+		course.setCourseSubject(obj.getString("courseSubject"));
+		course.setCourseLevel(obj.getString("courseLevel"));
+		course.setCourseLink(obj.getString("courseLink"));
+		course.setContentIntro(obj.getString("contentIntro"));
+		course.setValidPeriod(obj.getString("validPeriod"));
+		course.setStudentRank(obj.getString("studentRand"));
+		course.setStudentGrade(obj.getString("studentGrade"));
+		course.setTotalLessons(obj.getString("totalLessons"));
+		course.setTextbook(obj.getString("textbook"));
+		course.setPublishCompany(obj.getString("publishCompany"));
+		course.setIsbnNumber(obj.getString("isbnNumber"));
+		return R.status(courseService.save(course));
+
+	}
+
 
 
 	/**

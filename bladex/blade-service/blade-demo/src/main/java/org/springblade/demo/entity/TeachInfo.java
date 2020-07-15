@@ -18,6 +18,8 @@ package org.springblade.demo.entity;
 
 import java.time.LocalDate;
 import java.io.Serializable;
+
+import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import io.swagger.annotations.ApiModel;
@@ -39,6 +41,7 @@ public class TeachInfo implements Serializable {
 	 * 教师ID
 	 */
 	@ApiModelProperty(value = "教师ID")
+	@TableId(value = "teach_id")
 	private Integer teachId;
 	/**
 	 * 教师名字

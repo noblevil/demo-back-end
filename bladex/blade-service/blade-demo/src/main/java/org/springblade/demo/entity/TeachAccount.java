@@ -16,6 +16,7 @@
  */
 package org.springblade.demo.entity;
 
+import com.baomidou.mybatisplus.annotation.TableId;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -39,6 +40,7 @@ public class TeachAccount implements Serializable {
 	* 教师ID
 	*/
 		@ApiModelProperty(value = "教师ID")
+		@TableId(value = "teach_id")
 		private Integer teachId;
 	/**
 	* 账号名
