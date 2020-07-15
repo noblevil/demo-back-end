@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import javax.crypto.spec.SecretKeySpec;
 import javax.xml.bind.DatatypeConverter;
 import java.security.Key;
-import java.util.Base64;
 import java.util.Date;
 
 /**
@@ -46,7 +45,7 @@ public class JwtTokenUtil {
             throw new CustomException(ResultCode.PERMISSION_TOKEN_EXPIRED);
         } catch (Exception e){
             log.error("===== Token解析异常 =====", e);
-            throw new CustomException(ResultCode.PERMISSION_TOKEN_INVALID);
+            throw new CustomException(ResultCode.PERMISSION_TOKEN_PARSE_ERROR);
         }
     }
 
@@ -74,6 +73,7 @@ public class JwtTokenUtil {
             String encryId = Base64Util.encode(userId);
 
             //添加构成JWT的参数
+			//可在claim中添加自定义参数
             JwtBuilder builder = Jwts.builder().setHeaderParam("typ", "JWT")
                     // 可以将基本不重要的对象信息放到claims
                     .claim("role", role)
@@ -131,6 +131,19 @@ public class JwtTokenUtil {
     public static String getUserRole(String token, String base64Security) {
     	String role = parseJWT(token, base64Security).get("role", String.class);
     	return role;
+	}
+
+	/**
+	 * 是否需要刷新token，时间单位是毫秒
+	 * @param token
+	 * @param audience
+	 * @return
+	 */
+	public static boolean isSafe(String token, Audience audience) {
+		Date start = parseJWT(token, audience.getBase64Secret()).getIssuedAt();
+//		System.out.println("now: " + (new Date()).getTime());
+//		System.out.println("safe: " + (start.getTime() + audience.getSafeSecond()));
+		return new Date().before(new Date(start.getTime() + audience.getSafeSecond()));
 	}
 
     /**

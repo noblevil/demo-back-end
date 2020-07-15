@@ -13,7 +13,7 @@ public class AuthException extends RuntimeException {
 	ResultCode resultCode;
 
 	public AuthException(ResultCode resultCode){
-		super(resultCode.message());
+		super(resultCode.getMessage());
 		this.resultCode = resultCode;
 	}
 

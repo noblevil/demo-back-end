@@ -1,11 +1,11 @@
 package org.springblade.demo.controller;
 
-import com.alibaba.fastjson.JSONObject;
 import lombok.AllArgsConstructor;
+import org.springblade.core.tool.api.R;
 import org.springblade.demo.annotation.JwtIgnore;
 import org.springblade.demo.annotation.Role;
-import org.springblade.demo.common.response.Result;
 import org.springblade.demo.common.RoleCode;
+import org.springblade.demo.common.response.ResultCode;
 import org.springblade.demo.entity.User;
 import org.springblade.demo.model.Audience;
 import org.springblade.demo.util.JwtTokenUtil;
@@ -32,19 +32,19 @@ public class AdminUserController {
 
     @PostMapping("/ceshi")
 	@Role(include = {RoleCode.TEACH})
-	public Result t(@RequestBody User user){
-    	return Result.SUCCESS(user.getUsername());
+	public R t(@RequestBody User user){
+    	return R.success(ResultCode.SUCCESS);
 	}
 
     @PostMapping("/signin")
 	@JwtIgnore
-    public Result adminLogin(HttpServletResponse response, String account, String password, String role) {
+    public R adminLogin(HttpServletResponse response, String account, String password, String role) {
 
 		/**
 		 * 验证role值的合法性
 		 */
 		if(!RoleCode.checkValidity(role)) {
-			return Result.FAIL("角色类型错误");
+			return R.fail(ResultCode.USER_ROLE_NOT_EXIST);
 		}
 
 		/**
@@ -53,7 +53,7 @@ public class AdminUserController {
 		 * 需返回用户的username和ID，用于构造token
  		 */
         if(!password.equals("123456")) {
-			return Result.FAIL("密码错误");
+			return R.fail(ResultCode.USER_LOGIN_ERROR);
 		}
 		String userId = "1";
 		String userName = "cc";
@@ -65,14 +65,14 @@ public class AdminUserController {
         // 将token放在响应头
         response.setHeader(JwtTokenUtil.AUTH_HEADER_KEY, JwtTokenUtil.TOKEN_PREFIX + token);
         // 将token响应给客户端
-        JSONObject result = new JSONObject();
-        result.put("token", token);
-        return Result.SUCCESS(result);
+//        JSONObject result = new JSONObject();
+//        result.put("token", token);
+        return R.data(token);
     }
 
     @GetMapping("/users")
-    public Result userList() {
+    public R userList() {
         log.info("### 查询所有用户列表 ###");
-        return Result.SUCCESS();
+        return R.success("查询成功");
     }
 }

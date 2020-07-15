@@ -21,5 +21,6 @@ public class Audience {
     private String base64Secret;
     private String name;
     private int expiresSecond;
+    private int safeSecond;
 
 }
