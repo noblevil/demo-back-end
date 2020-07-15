@@ -16,8 +16,6 @@
  */
 package org.springblade.demo.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -26,28 +24,47 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * 实体类
+ * 机构登录信息 实体类
  *
  * @author BladeX
- * @since 2020-07-12
+ * @since 2020-07-11
  */
 @Data
-@ApiModel(value = "RelOrgTeach对象", description = "RelOrgTeach对象")
-public class RelOrgTeach implements Serializable {
+@ApiModel(value = "OrgAccount对象", description = "机构登录信息 ")
+public class OrgAccount implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	@TableId(value = "rel_id", type = IdType.AUTO)
-	private Integer relId;
-	private Integer orgId;
-	private Integer teachId;
 	/**
-	* 0 表示机构确认  教师没确认   1 表示机构 教师双方确认2 表示 教师提出离职申请 机构还未确认  3 表示 已经离职
+	* 机构ID
 	*/
-		@ApiModelProperty(value = "0 表示机构确认  教师没确认   1 表示机构 教师双方确认2 表示 教师提出离职申请 机构还未确认  3 表示 已经离职")
-		private Integer orgTeachStatus;
-	private LocalDateTime startTime;
-	private LocalDateTime endTime;
+		@ApiModelProperty(value = "机构ID")
+		private Integer orgId;
+	/**
+	* 机构账号名
+	*/
+		@ApiModelProperty(value = "机构账号名")
+		private String orgAccount;
+	/**
+	* 手机号
+	*/
+		@ApiModelProperty(value = "手机号")
+		private String orgPhone;
+	/**
+	* 邮箱
+	*/
+		@ApiModelProperty(value = "邮箱")
+		private String orgEmail;
+	/**
+	* 密码
+	*/
+		@ApiModelProperty(value = "密码")
+		private String passwd;
+	/**
+	* 账户创建时间
+	*/
+		@ApiModelProperty(value = "账户创建时间")
+		private LocalDateTime createTime;
 
 
 }

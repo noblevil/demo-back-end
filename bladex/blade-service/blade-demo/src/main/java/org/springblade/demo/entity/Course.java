@@ -16,18 +16,20 @@
  */
 package org.springblade.demo.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
-import java.io.Serializable;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import com.baomidou.mybatisplus.annotation.TableId;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+
+import java.io.Serializable;
 
 /**
  * 课程内容 实体类
  *
  * @author BladeX
- * @since 2020-07-04
+ * @since 2020-07-13
  */
 @Data
 @ApiModel(value = "Course对象", description = "课程内容 ")
@@ -39,7 +41,8 @@ public class Course implements Serializable {
 	* 课程ID
 	*/
 		@ApiModelProperty(value = "课程ID")
-		private Integer courseId;
+		@TableId(value = "course_id", type = IdType.AUTO)
+	private Integer courseId;
 	/**
 	* 外键
 	*/

@@ -16,6 +16,7 @@
  */
 package org.springblade.demo.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.xiaoymin.knife4j.annotations.ApiOperationSupport;
 import io.swagger.annotations.Api;
@@ -28,18 +29,19 @@ import org.springblade.core.mp.support.Query;
 import org.springblade.core.tool.api.R;
 import org.springblade.core.tool.utils.Func;
 import org.springblade.demo.annotation.JwtIgnore;
-import org.springblade.demo.entity.Course;
-import org.springblade.demo.entity.OrgInfo;
-import org.springblade.demo.entity.RelOrgTeach;
-import org.springblade.demo.service.ICourseService;
-import org.springblade.demo.service.IOrgInfoService;
+import org.springblade.demo.annotation.Role;
+import org.springblade.demo.common.RoleCode;
+import org.springblade.demo.entity.*;
+import org.springblade.demo.service.*;
 import org.springblade.demo.vo.OrgInfoVO;
 import org.springframework.web.bind.annotation.*;
+import sun.text.resources.no.CollationData_no;
 
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * 机构信息  控制器
@@ -55,10 +57,13 @@ public class OrgInfoController extends BladeController {
 
 	private IOrgInfoService orgInfoService;
 	private ICourseService courseService;
-
+	private ITeachAccountService teachAccountService;
+	private IRelOrgTeachService relOrgTeachService;
+	private IOrgAccountService orgAccountService;
+	private IOrgQualifDataService orgQualifDataService;
 	/**
 	 * 根据机构id获取机构信息详情
-	 * 例如：http://localhost:9101/orginfo/getOrgDetailById?id=2
+	 * 例如：http://localhost:9101/orginfo/getOrgDetailById?orgId=2
 	 */
 	@JwtIgnore
 	@GetMapping("/getOrgDetailById")  //【API-1】
@@ -86,7 +91,7 @@ public class OrgInfoController extends BladeController {
 	}
 
 	/**
-	 * 分页（第几页，每页多少条数据） 查询所有机构信息，
+	 * 分页（第几页，每页多少条数据） 查询所有机构信息
 	 * 例如：http://localhost:9101/orginfo/getAllOrgListByPage?current=2&size=1（第二页，每页1条信息）
 	 */
 	@JwtIgnore
@@ -141,12 +146,202 @@ public class OrgInfoController extends BladeController {
 			list = returnList;
 
 		}
-
-
-
-
-
 		return R.data(list);
+	}
+
+	/**
+	 * 获取教师所属的所有机构的信息——7.13
+	 * http://localhost:9101/orginfo/getOrgByTeachAccount?teachAccount=110
+	 */
+	@JwtIgnore
+//	@Role(include = {RoleCode.TEACH})
+	@GetMapping("/getOrgByTeachAccount")
+	@ApiOperationSupport(order = 1)
+	@ApiOperation(value = "根据教师账户名获取教师所属的所有机构信息", notes = "传入教师账户名")
+	public  R<List<OrgInfo>> getOrgByTeachAccount(String teachAccount) {
+		TeachAccount teachAccountCondition=new TeachAccount();
+		teachAccountCondition.setTeachAccount(teachAccount);
+		TeachAccount teachAccountInfo=teachAccountService.getOne(Condition.getQueryWrapper(teachAccountCondition));
+		//获得教师账户名
+		int teachId;
+		try{
+			teachId=teachAccountInfo.getTeachId();
+		}catch (Exception e){
+			return R.fail("此教师账户名不存在！");
+		}
+		//查询rel_org_teach获取教师所属的全部机构id
+		RelOrgTeach relOrgTeachCondition=new RelOrgTeach();
+		relOrgTeachCondition.setTeachId(teachId);
+		List<RelOrgTeach> relOrgTeachesList=relOrgTeachService.list(Condition.getQueryWrapper(relOrgTeachCondition));
+		//遍历获取机构id，得到机构详情列表
+		List<OrgInfo> orgInfoList=new ArrayList<>();
+		for(int i=0;i<relOrgTeachesList.size();++i){
+			OrgInfo orgInfoCondition=new OrgInfo();
+			orgInfoCondition.setOrgId(relOrgTeachesList.get(i).getOrgId());
+			OrgInfo orgInfoDetail=orgInfoService.getOne(Condition.getQueryWrapper(orgInfoCondition));
+			orgInfoList.add(orgInfoDetail);
+		}
+		return R.data(orgInfoList);
+	}
+
+
+	/**
+	 * ybj
+	 * http://localhost:9101/orginfo/searchOrg?condition=机构名或机构id
+	 * 筛选：根据机构名搜索机构——7.12
+	 *
+	 */
+	@JwtIgnore
+//	@Role(include = {RoleCode.TEACH})
+	@GetMapping("/searchOrg")
+	@ApiOperationSupport(order = 1)
+	@ApiOperation(value = "条件查询：获取机构所属的课程名", notes = "传入机构名")
+	public  R<List<OrgInfo>> queryOrgInfo(String condition) {
+		//Course courseCondition=new Course();
+		OrgInfo orgInfoCondition = new OrgInfo();
+		Pattern pattern = Pattern.compile("[0-9]*");
+		boolean type=pattern.matcher(condition).matches();  //用正则表达式判断传入的参数类型，若为数字，返回true
+		if(type) {  //数字类型
+			Integer orgId = Integer.valueOf(condition);
+			System.out.println("传入机构id=" + orgId);
+			orgInfoCondition.setOrgId(orgId);  //设置筛选条件
+		}
+		else {
+			//根据机构名获取机构id
+			OrgInfo orgCondition=new OrgInfo();  //筛选条件
+			orgCondition.setOrgName(condition);
+			OrgInfo orgInfo=orgInfoService.getOne(Condition.getQueryWrapper(orgCondition));
+			try{
+				Integer orgId=orgInfo.getOrgId();
+				orgInfoCondition.setOrgId(orgId);
+			}
+			catch (Exception e){
+				return R.fail("机构账户不存在");
+//				return R.data(200,null,"机构账户不存在");
+			}
+		}
+		//获取机构所属的所有课程信息
+		List<OrgInfo> list = orgInfoService.list(Condition.getQueryWrapper(orgInfoCondition));
+		return R.data(list);
+	}
+
+
+	/**
+	 * ybj	7.13
+	 * 机构
+	 * 根据orgAccount获取机构信息、机构账户、机构资质材料信息
+	 * Request Example：http://localhost:9101/orginfo/getOrgInfo?orgAccount=1101234561
+	 * @param orgAccount
+	 * @return
+	 */
+	@JwtIgnore
+//	@Role(include = {RoleCode.ORG})
+	@ApiOperationSupport(order = 1)
+	@ApiOperation(value="获取机构信息、机构账户、机构资质材料信息",notes="传入机构账户orgAccount")
+	@GetMapping("/getOrgInfo")
+	public R<JSONObject> getOrgInfo(String orgAccount){
+		//根据机构账户名得到机构id
+		OrgAccount orgAccountCondition = new OrgAccount();
+		orgAccountCondition.setOrgAccount(orgAccount);
+		int orgId;
+		try{
+			orgId = orgAccountService.getOne(Condition.getQueryWrapper(orgAccountCondition)).getOrgId();
+		}catch (Exception e){
+			return R.fail("机构不存在!");
+		}
+		JSONObject obj = new JSONObject();
+		//根据orgId获取三个表的信息，存入JSONObject对象
+		OrgInfo orgInfo = new OrgInfo();
+		orgInfo.setOrgId(orgId);
+		obj.put("orgInfo", orgInfoService.getOne(Condition.getQueryWrapper(orgInfo)));
+
+		OrgAccount orgAcc = new OrgAccount();
+		orgAcc.setOrgId(orgId);
+		obj.put("orgAccount", orgAccountService.getOne(Condition.getQueryWrapper(orgAcc)));
+
+		OrgQualifData orgQualifData = new OrgQualifData();
+		orgQualifData.setOrgId(orgId);
+		obj.put("orgQualifData", orgQualifDataService.getOne(Condition.getQueryWrapper(orgQualifData)));
+		return R.data(obj);
+	}
+
+
+	/**
+	 * ybj	7.13
+	 * 机构
+	 *根据orgAccount对机构账户相关信息(orgPhone,passwd)进行修改，更新到数据库机构账户表中
+	 * Request Example：http://localhost:9101/orginfo/UpdateOrgAccountInfo?+(Body)
+	 * @param obj
+	 * @return
+	 */
+	@JwtIgnore
+//	@Role(include = {RoleCode.ORG})
+	@ApiOperationSupport(order = 2)
+	@ApiOperation(value="",notes="")
+	@PostMapping("/UpdateOrgAccountInfo")
+	public R UpdateOrgAccountInfo(@Valid @RequestBody JSONObject obj){
+		//根据orgAccount得到orgId
+		System.out.println(obj);
+		String orgAccount = obj.getString("orgAccount");
+		OrgAccount orgAcc = new OrgAccount();
+		orgAcc.setOrgAccount(orgAccount);
+		int orgId;
+		try {
+			orgId = orgAccountService.getOne(Condition.getQueryWrapper(orgAcc)).getOrgId();
+		}catch (Exception e){
+			return R.fail("机构不存在!");
+		}
+		//获取机构账户信息并修改
+		OrgAccount orgAccountCondition = new OrgAccount();
+		orgAccountCondition = orgAccountService.getOne(Condition.getQueryWrapper(orgAcc));
+		if(orgAccountCondition.getPasswd() == obj.getString("passwd"))
+		{
+			return R.fail("新密码不能与旧密码相同!");
+		}
+		if(orgAccountCondition.getOrgPhone() == obj.getString("orgPhone"))
+		{
+			return R.fail("新手机号码不能与旧手机号码相同!");
+		}
+		orgAccountCondition.setOrgPhone(obj.getString("orgPhone"));
+		orgAccountCondition.setPasswd(obj.getString("passwd"));
+		return R.data(orgAccountService.updateById(orgAccountCondition));
+	}
+
+
+	/**
+	 * ybj 7.13
+	 * 机构
+	 * 根据orgAccount修改机构信息（linkmanOne,linkmanOnePhone,linkmanTwo,linkmanTwoPhone），更新数据到机构信息表
+	 * Request Example：http://localhost:9101/orginfo/UpdateOrgInfo?+(Body)
+	 * @param obj
+	 * @return
+	 */
+	@JwtIgnore
+//	@Role(include = {RoleCode.ORG})
+	@ApiOperationSupport(order = 3)
+	@ApiOperation(value="",notes="")
+	@PostMapping("/UpdateOrgInfo")
+	public R UpdateOrgInfo(@Valid @RequestBody JSONObject obj){
+		String orgAccount = obj.getString("orgAccount");
+		OrgAccount orgAccountCondition = new OrgAccount();
+		orgAccountCondition.setOrgAccount(orgAccount);
+		//orgId
+		int orgId;
+		try{
+			orgId = orgAccountService.getOne(Condition.getQueryWrapper(orgAccountCondition)).getOrgId();
+		}catch (Exception e){
+			return R.fail("机构不存在!");
+		}
+		//根据orgId获取机构信息
+		OrgInfo orgInfoCondition = new OrgInfo();
+		orgInfoCondition.setOrgId(orgId);
+		OrgInfo orgInfo = new OrgInfo();
+		orgInfo = orgInfoService.getOne(Condition.getQueryWrapper(orgInfoCondition));
+		orgInfo.setLinkmanOne(obj.getString("linkmanOne"));
+		orgInfo.setLinkmanOne(obj.getString("linkmanOnePhone"));
+		orgInfo.setLinkmanOne(obj.getString("linkmanTwo"));
+		orgInfo.setLinkmanOne(obj.getString("linkmanTwoPhone"));
+		return R.status(orgInfoService.updateById(orgInfo));
 	}
 
 	//===========================以下为自动生成的接口==============================

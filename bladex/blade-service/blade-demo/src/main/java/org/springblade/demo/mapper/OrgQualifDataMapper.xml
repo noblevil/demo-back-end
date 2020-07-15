@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.springblade.demo.mapper.OrgQualifDataMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="orgQualifDataResultMap" type="org.springblade.demo.entity.OrgQualifData">
+        <id column="org_id" property="orgId"/>
+        <result column="legal_represent_name" property="legalRepresentName"/>
+        <result column="legal_represent_phone" property="legalRepresentPhone"/>
+        <result column="id_type" property="idType"/>
+        <result column="id_num" property="idNum"/>
+        <result column="id_card_front" property="idCardFront"/>
+        <result column="id_card_reverse" property="idCardReverse"/>
+        <result column="icp_record_num" property="icpRecordNum"/>
+        <result column="telecommunication_business_license" property="telecommunicationBusinessLicense"/>
+        <result column="network_sec_lev_rec" property="networkSecLevRec"/>
+    </resultMap>
+
+
+    <select id="selectOrgQualifDataPage" resultMap="orgQualifDataResultMap">
+        select * from org_qualif_data where is_deleted = 0
+    </select>
+
+</mapper>

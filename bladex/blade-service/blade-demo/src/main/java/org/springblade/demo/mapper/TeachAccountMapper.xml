@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.springblade.demo.mapper.TeachAccountMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="teachAccountResultMap" type="org.springblade.demo.entity.TeachAccount">
+        <id column="teach_id" property="teachId"/>
+        <result column="teach_account" property="teachAccount"/>
+        <result column="teach_phone" property="teachPhone"/>
+        <result column="teach_email" property="teachEmail"/>
+        <result column="passwd" property="passwd"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+
+
+    <select id="selectTeachAccountPage" resultMap="teachAccountResultMap">
+        select * from teach_account where is_deleted = 0
+    </select>
+
+</mapper>

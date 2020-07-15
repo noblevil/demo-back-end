@@ -57,7 +57,7 @@ public class TeachInfo implements Serializable {
 	* 教师出生日期
 	*/
 		@ApiModelProperty(value = "教师出生日期")
-		private String teachBirth;
+		private LocalDate teachBirth;
 	/**
 	* 教师授课学科
 	*/

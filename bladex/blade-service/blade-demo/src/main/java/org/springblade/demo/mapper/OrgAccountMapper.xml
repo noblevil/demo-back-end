@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.springblade.demo.mapper.OrgAccountMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="orgAccountResultMap" type="org.springblade.demo.entity.OrgAccount">
+        <id column="org_id" property="orgId"/>
+        <result column="org_account" property="orgAccount"/>
+        <result column="org_phone" property="orgPhone"/>
+        <result column="org_email" property="orgEmail"/>
+        <result column="passwd" property="passwd"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+
+
+    <select id="selectOrgAccountPage" resultMap="orgAccountResultMap">
+        select * from org_account where is_deleted = 0
+    </select>
+
+</mapper>
