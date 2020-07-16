@@ -1,8 +1,8 @@
 package org.springblade.demo.common.exception.handler;
 
+import org.springblade.core.tool.api.R;
 import org.springblade.demo.common.exception.AuthException;
 import org.springblade.demo.common.exception.CustomException;
-import org.springblade.demo.common.response.Result;
 import org.springblade.demo.common.response.ResultCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,30 +26,30 @@ public class GlobalExceptionHandler {
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
 	/**
-	 * 处理权限异常
+	 * 处理权限异常（无访问权限）
 	 */
 	@ExceptionHandler(AuthException.class)
-	public Result handleException(AuthException e) {
+	public R handleException(AuthException e) {
 		// 打印异常信息
 		log.error("### 异常信息:{} ###", e.getMessage());
-		return new Result(e.getResultCode());
+		return R.fail(e.getResultCode());
 	}
 
     /**
      * 处理自定义异常
      */
 	@ExceptionHandler(CustomException.class)
-	public Result handleException(CustomException e) {
+	public R handleException(CustomException e) {
         // 打印异常信息
         log.error("### 异常信息:{} ###", e.getMessage());
-        return new Result(e.getResultCode());
+        return R.fail(e.getResultCode());
 	}
 
     /**
      * 参数错误异常
      */
     @ExceptionHandler({MethodArgumentNotValidException.class, BindException.class})
-    public Result handleException(Exception e) {
+    public R handleException(Exception e) {
 
         if (e instanceof MethodArgumentNotValidException) {
             MethodArgumentNotValidException validException = (MethodArgumentNotValidException) e;
@@ -69,19 +69,19 @@ public class GlobalExceptionHandler {
             }
         }
 
-        return new Result(ResultCode.PARAM_IS_INVALID);
+        return R.fail(ResultCode.PARAM_TYPE_BIND_ERROR);
     }
 
     /**
      * 处理所有不可知的异常
      */
     @ExceptionHandler(Exception.class)
-    public Result handleOtherException(Exception e){
+    public R handleOtherException(Exception e){
         //打印异常堆栈信息
         e.printStackTrace();
         // 打印异常信息
         log.error("### 不可知的异常:{} ###", e.getMessage());
-        return new Result(ResultCode.SYSTEM_INNER_ERROR);
+        return R.fail(ResultCode.UNKNOWN_ERROR);
     }
 
 }

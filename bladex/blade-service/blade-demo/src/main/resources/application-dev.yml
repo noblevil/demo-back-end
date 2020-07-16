@@ -13,4 +13,7 @@ audience:
   clientId: 098f6bcd4621d373cade4e832627b4f6
   base64Secret: MDk4ZjZiY2Q0NjIxZDM3M2NhZGU0ZTgzMjYyN2I0ZjY=
   name: restapiuser
-  expiresSecond: 172800
+  # 单位：毫秒
+  # 单个token使用时长为1小时，token每半小时刷新一次
+  expiresSecond: 3600000
+  safeSecond: 1800000

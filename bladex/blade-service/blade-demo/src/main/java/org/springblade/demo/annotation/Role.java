@@ -14,7 +14,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)							// 运行时
 @Documented
 public @interface Role{
-	// 默认为空，多个角色用逗号分隔
+	// 多个角色用逗号分隔
 
 	/**
 	 * 允许访问的角色类型
@@ -22,9 +22,4 @@ public @interface Role{
 	 */
 	RoleCode[] include() default RoleCode.ADMIN;
 
-	/**
-	 * 不允许访问的角色类型
-	 * 默认值为visitor权限的用户，只起占位作用
-	 */
-	RoleCode[] exclude() default RoleCode.VISITOR;
 }

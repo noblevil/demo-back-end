@@ -59,4 +59,8 @@ public enum RoleCode {
 		return false;
 	}
 
+	public static RoleCode[] getAllRoles() {
+		return RoleCode.values();
+	}
+
 }

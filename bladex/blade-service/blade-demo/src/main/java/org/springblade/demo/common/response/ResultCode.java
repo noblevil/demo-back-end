@@ -1,6 +1,8 @@
 package org.springblade.demo.common.response;
 
 
+import org.springblade.core.tool.api.IResultCode;
+
 /**
  * ========================
  * 通用响应状态
@@ -11,13 +13,16 @@ package org.springblade.demo.common.response;
  * Version: v1.0
  * ========================
  */
-public enum ResultCode {
+public enum ResultCode implements IResultCode {
 
     /* 成功状态码 */
-    SUCCESS(0,"操作成功！"),
+    SUCCESS(200,"操作成功！"),
 
     /* 错误状态码 */
-    FAIL(-1,"操作失败！"),
+    FAIL(400,"操作失败！"),
+
+	/* 未知异常 */
+	UNKNOWN_ERROR(-1, "未知异常"),
 
     /* 参数错误：10001-19999 */
     PARAM_IS_INVALID(10001, "参数无效"),
@@ -31,6 +36,7 @@ public enum ResultCode {
     USER_ACCOUNT_FORBIDDEN(20003, "账号已被禁用"),
     USER_NOT_EXIST(20004, "用户不存在"),
     USER_HAS_EXISTED(20005, "用户已存在"),
+	USER_ROLE_NOT_EXIST(20006, "用户角色类型不存在"),
 
     /* 业务错误：30001-39999 */
     BUSINESS_GROUP_NO_ALLOWED_DEL(30001, "应用分组已经被应用使用，不能删除"),
@@ -82,7 +88,8 @@ public enum ResultCode {
     PERMISSION_TOKEN_EXPIRED(70004, "token已过期"),
     PERMISSION_LIMIT(70005, "访问次数受限制"),
     PERMISSION_TOKEN_INVALID(70006, "无效token"),
-    PERMISSION_SIGNATURE_ERROR(70007, "签名失败");
+    PERMISSION_SIGNATURE_ERROR(70007, "token签名失败"),
+	PERMISSION_TOKEN_PARSE_ERROR(70008, "token解析异常");
 
     //操作代码
     int code;
@@ -93,11 +100,11 @@ public enum ResultCode {
         this.message = message;
     }
 
-    public int code() {
+    public int getCode() {
         return code;
     }
 
-    public String message() {
+    public String getMessage() {
         return message;
     }
 
