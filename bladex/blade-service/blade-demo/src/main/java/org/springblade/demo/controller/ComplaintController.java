@@ -36,6 +36,7 @@ import org.springblade.demo.service.IOrgInfoService;
 import org.springblade.demo.vo.ComplaintVO;
 import org.springframework.cloud.client.ConditionalOnDiscoveryEnabled;
 import org.springframework.web.bind.annotation.*;
+import org.xnio.channels.SuspendableAcceptChannel;
 
 import javax.validation.Valid;
 import javax.xml.bind.Element;
@@ -70,6 +71,20 @@ public class ComplaintController extends BladeController {
 		orgInfoCondition.setOrgId(orgId);
 		String orgName=orgInfoService.getOne(Condition.getQueryWrapper(orgInfoCondition)).getOrgName();
 		return orgName;
+	}
+
+	/**
+	 * cyf:7.16
+	 * 根据机构名称获取机构id
+	 * http://localhost:9101/complaint/getOrgIdByOrgName?orgName=小神童
+	 */
+	@JwtIgnore
+	@GetMapping("/getOrgIdByOrgName")
+	@ApiOperation(value = "根据机构id获取机构名称", notes = "orgName")
+	public int getOrgIdByOrgName(String orgName) {
+		OrgInfo orgInfoCondition=new OrgInfo();
+		orgInfoCondition.setOrgName(orgName);
+		return orgInfoService.getOne(Condition.getQueryWrapper(orgInfoCondition)).getOrgId();
 	}
 
 
@@ -147,7 +162,32 @@ public class ComplaintController extends BladeController {
 	@JwtIgnore
 	@PostMapping("/addComplaint")
 	@ApiOperation(value = "新增新增投诉信息", notes = "以RequestBody方式传入投诉信息complaint")
-	public R addComplaint(@Valid @RequestBody Complaint complaint) {
+//	public R addComplaint(@Valid @RequestBody Complaint complaint) {
+//
+//		return R.status(complaintService.save(complaint));
+//	}
+	public R addComplaint( @Valid @RequestBody String parameters) {  //参入参数由后台进行解析
+		JSONObject jsonObject =JSONObject.parseObject(parameters);
+		String orgName=jsonObject.getString("orgName");
+		String title=jsonObject.getString("title");
+		String content=jsonObject.getString("content");
+		String suggest=jsonObject.getString("suggest");
+
+		int orgId;
+		try{
+			orgId=getOrgIdByOrgName(orgName);
+		}catch (Exception e){
+//			System.out.println("获取机构id异常！");
+			System.out.println("参数解析："+orgName+","+title+","+content+","+suggest);
+			e.printStackTrace();
+			return R.fail("获取机构id异常");
+		}
+		System.out.println("参数解析："+orgId+","+orgName+","+title+","+content+","+suggest);
+		Complaint complaint=new Complaint();
+		complaint.setOrgId(orgId);
+		complaint.setTitle(title);
+		complaint.setContent(content);
+		complaint.setSuggest(suggest);
 		return R.status(complaintService.save(complaint));
 	}
 
@@ -159,7 +199,7 @@ public class ComplaintController extends BladeController {
 	@JwtIgnore
 	@GetMapping("/getOrgComplaintTitleList")
 	@ApiOperation(value = "根据机构名获取机构的投诉标题列表", notes = "机构名称")
-	public R<JSONObject> getOrgComplaintTitleList(String orgName) {
+	public R<List<JSONObject>> getOrgComplaintTitleList(String orgName) {
 		//根据机构名获取机构id
 		OrgInfo orgInfoCondition = new OrgInfo();
 		orgInfoCondition.setOrgName(orgName);
@@ -170,15 +210,14 @@ public class ComplaintController extends BladeController {
 		complaintCondition.setOrgId(orgId);
 		List<Complaint> list = complaintService.list(Condition.getQueryWrapper(complaintCondition));
 		//筛选出需要的字段
-		JSONObject objList = new JSONObject();  //注意导入的包是：import com.alibaba.fastjson.JSONObject;，而不是：json.JSONObject，后者返回数据为空
+		List<JSONObject> objList = new ArrayList<>();  //注意导入的包是：import com.alibaba.fastjson.JSONObject;，而不是：json.JSONObject，后者返回数据为空
 		for (int i = 0; i < list.size(); ++i) {
 			JSONObject obj = new JSONObject();
 			obj.put("orgId", orgId);
-			obj.put("orgNmae", orgName);
+			obj.put("orgName", orgName);
 			obj.put("complaintId", list.get(i).getComplaintId());
 			obj.put("title", list.get(i).getTitle());
-//			objList.put(obj);
-			objList.put(new String(String.valueOf(i)),obj);
+			objList.add(obj);
 			System.out.println(obj);
 
 		}
