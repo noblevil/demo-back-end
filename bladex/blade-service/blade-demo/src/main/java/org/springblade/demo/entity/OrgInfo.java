@@ -155,6 +155,10 @@ public class OrgInfo implements Serializable {
 	*/
 		@ApiModelProperty(value = "0：白名单；1：黑名单；2：灰名单")
 		private Integer listType;
-
+	/**
+	 * 机构所在地：通过三级菜单选择
+	 */
+	@ApiModelProperty(value = "机构所在地：通过三级菜单选择")
+	private String orgLocation;
 
 }

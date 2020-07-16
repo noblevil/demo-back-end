@@ -275,6 +275,63 @@ public class ComplaintController extends BladeController {
 		return R.data(jsonObject);
 	}
 
+	/**
+	 * cyf:7.15
+	 * 根据机构名获取机构的投诉标题列表（考虑机构所在地）
+	 * http://localhost:9101/complaint/getOrgComplaintTitleList2?orgName=学小易
+	 */
+	@JwtIgnore
+	@GetMapping("/getOrgComplaintTitleList2")
+	@ApiOperation(value = "根据机构名获取机构的投诉标题列表", notes = "机构名称")
+	public R<List<JSONObject>> getOrgComplaintTitleList2(String orgLocation,String orgName) {
+		//根据机构名获取机构id
+		OrgInfo orgInfoCondition = new OrgInfo();
+		orgInfoCondition.setOrgLocation(orgLocation);
+		orgInfoCondition.setOrgName(orgName);
+		OrgInfo orgInfo = orgInfoService.getOne(Condition.getQueryWrapper(orgInfoCondition));
+		int orgId = orgInfo.getOrgId();
+		//根据机构	id查询机构投诉列表
+		Complaint complaintCondition = new Complaint();
+		complaintCondition.setOrgId(orgId);
+		List<Complaint> list = complaintService.list(Condition.getQueryWrapper(complaintCondition));
+		//筛选出需要的字段
+		List<JSONObject> objList = new ArrayList<>();  //注意导入的包是：import com.alibaba.fastjson.JSONObject;，而不是：json.JSONObject，后者返回数据为空
+		for (int i = 0; i < list.size(); ++i) {
+			JSONObject obj = new JSONObject();
+			obj.put("orgId", orgId);
+			obj.put("orgName", orgName);
+			obj.put("complaintId", list.get(i).getComplaintId());
+			obj.put("title", list.get(i).getTitle());
+			objList.add(obj);
+			System.out.println(obj);
+
+		}
+		System.out.println(objList);
+		return R.data(objList);
+	}
+
+	/**
+	 * cyf:7.15
+	 * 根据机构名获取机构的投诉信息列表（考虑机构所在地）
+	 * http://localhost:9101/complaint/getOrgComplaintList2?orgName=学小易
+	 */
+	@JwtIgnore
+	@GetMapping("/getOrgComplaintList2")
+	@ApiOperation(value = "根据机构名获取机构的投诉信息列表", notes = "机构名称")
+	public R<List<Complaint>> getOrgComplaintList2(String orgLocation,String orgName) {
+		//根据机构名获取机构id
+		OrgInfo orgInfoCondition = new OrgInfo();
+		orgInfoCondition.setOrgLocation(orgLocation);
+		orgInfoCondition.setOrgName(orgName);
+		OrgInfo orgInfo = orgInfoService.getOne(Condition.getQueryWrapper(orgInfoCondition));
+		int orgId = orgInfo.getOrgId();
+		//根据机构id查询机构投诉列表
+		Complaint complaintCondition = new Complaint();
+		complaintCondition.setOrgId(orgId);
+		List<Complaint> list = complaintService.list(Condition.getQueryWrapper(complaintCondition));
+		return R.data(list);
+	}
+
 	//===========================以下为自动生成的接口==============================
 
 	/**

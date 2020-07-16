@@ -28,6 +28,7 @@
         <result column="business_license" property="businessLicense"/>
         <result column="related_certificates" property="relatedCertificates"/>
         <result column="list_type" property="listType"/>
+        <result column="org_location" property="orgLocation"/>
     </resultMap>
 
 
