@@ -120,7 +120,11 @@ public class TeachInfoController extends BladeController {
 	@GetMapping("/queryTeachList")  //【API-7】
 	@ApiOperationSupport(order = 1)
 	@ApiOperation(value = "条件查询：获取教师信息详情", notes = "传入orgId+教师表任意字段的值（除教师id）")
-	public  R<List<TeachInfo>> queryOrgList(Integer orgId,TeachInfo teachInfo) {
+	public  R<List<TeachInfo>> queryOrgList(String orgAccount,TeachInfo teachInfo) {
+		//根据机构账户找到机构id
+		OrgAccount orgAccount1 = new OrgAccount();
+		orgAccount1.setOrgAccount(orgAccount);
+		int orgId = orgAccountService.getOne(Condition.getQueryWrapper(orgAccount1)).getOrgId();
 		List<TeachInfo> resultList=new ArrayList<>();
 		RelOrgTeach relOrgTeach=new RelOrgTeach() ;
 		relOrgTeach.setOrgId(orgId);
