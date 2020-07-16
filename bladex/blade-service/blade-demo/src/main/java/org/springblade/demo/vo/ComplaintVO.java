@@ -22,14 +22,14 @@ import lombok.EqualsAndHashCode;
 import io.swagger.annotations.ApiModel;
 
 /**
- * 视图实体类
+ * 校外投诉 视图实体类
  *
  * @author BladeX
- * @since 2020-06-16
+ * @since 2020-07-15
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-@ApiModel(value = "ComplaintVO对象", description = "ComplaintVO对象")
+@ApiModel(value = "ComplaintVO对象", description = "校外投诉 ")
 public class ComplaintVO extends Complaint {
 	private static final long serialVersionUID = 1L;
 

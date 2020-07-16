@@ -4,25 +4,16 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="complaintResultMap" type="org.springblade.demo.entity.Complaint">
-        <id column="id" property="id"/>
-        <result column="type" property="type"/>
-        <result column="obj" property="obj"/>
-        <result column="obj_name" property="objName"/>
+        <id column="complaint_id" property="complaintId"/>
+        <result column="org_id" property="orgId"/>
         <result column="title" property="title"/>
         <result column="content" property="content"/>
-        <result column="file" property="file"/>
-        <result column="contact_person" property="contactPerson"/>
-        <result column="phone" property="phone"/>
-        <result column="create_time" property="createTime"/>
-        <result column="click_num" property="clickNum"/>
-        <result column="status" property="status"/>
-        <result column="city" property="city"/>
-        <result column="district" property="district"/>
+        <result column="suggest" property="suggest"/>
     </resultMap>
 
 
     <select id="selectComplaintPage" resultMap="complaintResultMap">
-        select * from index_complaint where is_deleted = 0
+        select * from complaint where is_deleted = 0
     </select>
 
 </mapper>

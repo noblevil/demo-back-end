@@ -232,6 +232,7 @@ public class TeachInfoController extends BladeController {
 		int orgId;
 		try{
 			orgId=orgAccount1.getOrgId();
+			System.out.println("机构id:"+orgId);
 		}catch (Exception e){
 			return R.fail("机构不存在！");
 		}
@@ -262,6 +263,8 @@ public class TeachInfoController extends BladeController {
 				R status=R.status(teachAccountService.save(teachAccount_new));
 				System.out.println(status);  //测试账户信息添加状态
 			}catch (Exception e){
+				System.out.println("机构id:"+orgId+"教师账户信息："+teachAccount_new);
+				e.printStackTrace();
 				return R.fail("添加教师账户失败！");
 			}
 			//查询添加的账户自动生成的教师id
@@ -484,7 +487,7 @@ public class TeachInfoController extends BladeController {
 		DateTimeFormatter fmt1 = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 		//LocalDateTime createTime = LocalDateTime.parse(tcobj.getString("createTime"),fmt1);
 		LocalDateTime createTime = LocalDateTime.parse(time,fmt1);
-		
+
 		teachAccountCondition.setCreateTime(createTime);
 
 		//更新教师个人信息

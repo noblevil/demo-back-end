@@ -16,6 +16,7 @@
  */
 package org.springblade.demo.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -40,7 +41,7 @@ public class TeachAccount implements Serializable {
 	* 教师ID
 	*/
 		@ApiModelProperty(value = "教师ID")
-		@TableId(value = "teach_id")
+		@TableId(value = "teach_id",type= IdType.AUTO)
 		private Integer teachId;
 	/**
 	* 账号名

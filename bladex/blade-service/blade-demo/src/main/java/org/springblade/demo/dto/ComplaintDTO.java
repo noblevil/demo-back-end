@@ -21,10 +21,10 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * 数据传输对象实体类
+ * 校外投诉 数据传输对象实体类
  *
  * @author BladeX
- * @since 2020-06-16
+ * @since 2020-07-15
  */
 @Data
 @EqualsAndHashCode(callSuper = true)

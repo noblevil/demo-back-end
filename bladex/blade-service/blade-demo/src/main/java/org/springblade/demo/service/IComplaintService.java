@@ -22,10 +22,10 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 
 /**
- *  服务类
+ * 校外投诉  服务类
  *
  * @author BladeX
- * @since 2020-06-16
+ * @since 2020-07-15
  */
 public interface IComplaintService extends IService<Complaint> {
 

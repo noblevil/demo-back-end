@@ -16,17 +16,18 @@
  */
 package org.springblade.demo.mapper;
 
-import org.springblade.demo.entity.Complaint;
-import org.springblade.demo.vo.ComplaintVO;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import org.springblade.demo.entity.Complaint;
+import org.springblade.demo.vo.ComplaintVO;
+
 import java.util.List;
 
 /**
- *  Mapper 接口
+ * 校外投诉  Mapper 接口
  *
  * @author BladeX
- * @since 2020-06-16
+ * @since 2020-07-15
  */
 public interface ComplaintMapper extends BaseMapper<Complaint> {
 

@@ -25,10 +25,10 @@ import org.springframework.stereotype.Service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 
 /**
- *  服务实现类
+ * 校外投诉  服务实现类
  *
  * @author BladeX
- * @since 2020-06-16
+ * @since 2020-07-15
  */
 @Service
 public class ComplaintServiceImpl extends ServiceImpl<ComplaintMapper, Complaint> implements IComplaintService {
