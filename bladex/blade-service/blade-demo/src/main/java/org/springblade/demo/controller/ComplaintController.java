@@ -66,7 +66,8 @@ public class ComplaintController extends BladeController {
 	@JwtIgnore
 	@GetMapping("/getOrgNameByOrgId")
 	@ApiOperation(value = "根据机构id获取机构名称", notes = "orgId")
-	public String getOrgNameByOrgId(int orgId) {
+	public String getOrgNameByOrgId(Integer orgId) {
+		System.out.println("===传入参数orgId="+orgId);
 		OrgInfo orgInfoCondition=new OrgInfo();
 		orgInfoCondition.setOrgId(orgId);
 		String orgName=orgInfoService.getOne(Condition.getQueryWrapper(orgInfoCondition)).getOrgName();
@@ -261,12 +262,13 @@ public class ComplaintController extends BladeController {
 //		return R.data(complaintDetail);
 //	}
 	public R<JSONObject> getComplaintDetailById(int complaintId) {
+		System.out.println("===传入参数complaintId="+complaintId);
 		JSONObject jsonObject=new JSONObject();
 		Complaint complaintCondition = new Complaint();
 		complaintCondition.setComplaintId(complaintId);
 		Complaint complaintDetail = complaintService.getOne(Condition.getQueryWrapper(complaintCondition));
 		jsonObject.put("orgId",complaintDetail.getOrgId());
-		jsonObject.put("orgNmae",getOrgNameByOrgId(complaintDetail.getOrgId()));
+		jsonObject.put("orgName",getOrgNameByOrgId(complaintDetail.getOrgId()));
 		jsonObject.put("complaintId", complaintDetail.getComplaintId());
 		jsonObject.put("title", complaintDetail.getTitle());
 		jsonObject.put("content", complaintDetail.getContent());
