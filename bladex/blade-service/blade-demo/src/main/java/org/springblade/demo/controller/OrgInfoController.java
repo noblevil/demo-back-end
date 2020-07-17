@@ -280,28 +280,19 @@ public class OrgInfoController extends BladeController {
 	@ApiOperation(value="",notes="")
 	@PostMapping("/UpdateOrgAccountInfo")
 	public R UpdateOrgAccountInfo(@Valid @RequestBody JSONObject obj){
+		System.out.println("=====传入参数：obj="+obj);
 		//根据orgAccount得到orgId
-		System.out.println(obj);
+//		System.out.println(obj);
 		String orgAccount = obj.getString("orgAccount");
 		OrgAccount orgAcc = new OrgAccount();
 		orgAcc.setOrgAccount(orgAccount);
-		int orgId;
 		try {
-			orgId = orgAccountService.getOne(Condition.getQueryWrapper(orgAcc)).getOrgId();
+			int orgId = orgAccountService.getOne(Condition.getQueryWrapper(orgAcc)).getOrgId();
 		}catch (Exception e){
 			return R.fail("机构不存在!");
 		}
-		//获取机构账户信息并修改
-		OrgAccount orgAccountCondition = new OrgAccount();
-		orgAccountCondition = orgAccountService.getOne(Condition.getQueryWrapper(orgAcc));
-		if(orgAccountCondition.getPasswd() == obj.getString("passwd"))
-		{
-			return R.fail("新密码不能与旧密码相同!");
-		}
-		if(orgAccountCondition.getOrgPhone() == obj.getString("orgPhone"))
-		{
-			return R.fail("新手机号码不能与旧手机号码相同!");
-		}
+		//获取机构账户完整信息并修改
+		OrgAccount orgAccountCondition = orgAccountService.getOne(Condition.getQueryWrapper(orgAcc));
 		orgAccountCondition.setOrgPhone(obj.getString("orgPhone"));
 		orgAccountCondition.setPasswd(obj.getString("passwd"));
 		return R.data(orgAccountService.updateById(orgAccountCondition));
@@ -322,6 +313,7 @@ public class OrgInfoController extends BladeController {
 	@ApiOperation(value="",notes="")
 	@PostMapping("/UpdateOrgInfo")
 	public R UpdateOrgInfo(@Valid @RequestBody JSONObject obj){
+		System.out.println("=====传入参数：obj="+obj);
 		String orgAccount = obj.getString("orgAccount");
 		OrgAccount orgAccountCondition = new OrgAccount();
 		orgAccountCondition.setOrgAccount(orgAccount);
@@ -338,9 +330,9 @@ public class OrgInfoController extends BladeController {
 		OrgInfo orgInfo = new OrgInfo();
 		orgInfo = orgInfoService.getOne(Condition.getQueryWrapper(orgInfoCondition));
 		orgInfo.setLinkmanOne(obj.getString("linkmanOne"));
-		orgInfo.setLinkmanOne(obj.getString("linkmanOnePhone"));
-		orgInfo.setLinkmanOne(obj.getString("linkmanTwo"));
-		orgInfo.setLinkmanOne(obj.getString("linkmanTwoPhone"));
+		orgInfo.setLinkmanOnePhone(obj.getString("linkmanOnePhone"));
+		orgInfo.setLinkmanTwo(obj.getString("linkmanTwo"));
+		orgInfo.setLinkmanTwoPhone(obj.getString("linkmanTwoPhone"));
 		return R.status(orgInfoService.updateById(orgInfo));
 	}
 
