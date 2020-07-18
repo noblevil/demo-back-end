@@ -155,23 +155,24 @@ public class TeachInfoController extends BladeController {
 		TeachAccount teachAccountCondition=new TeachAccount();
 		teachAccountCondition.setTeachAccount(teachAccount);
 		//根据teachAccount查询教师id
-		try{
-			int teachId=teachAccountService.getOne(Condition.getQueryWrapper(teachAccountCondition)).getTeachId();
+		int teachId;
+		try {
+			teachId = teachAccountService.getOne(Condition.getQueryWrapper(teachAccountCondition)).getTeachId();
 			//设置查询条件
-			TeachInfo teachInfoCondition=new TeachInfo();
-			teachInfoCondition.setTeachId(teachId);
-			RelOrgTeach relOrgTeachCondition=new RelOrgTeach();
-			relOrgTeachCondition.setTeachId(teachId);
-			//结果返回
-			JSONObject result=new JSONObject();
-			result.put("teachInfo",teachInfoService.getOne(Condition.getQueryWrapper(teachInfoCondition)));
-			result.put("teachAccount",teachAccountService.getOne(Condition.getQueryWrapper(teachAccountCondition)));
-			result.put("relOrgTeach",relOrgTeachService.list(Condition.getQueryWrapper(relOrgTeachCondition)));
-			return R.data(result);
 		}
 		catch (Exception e){
 			return R.fail("教师账户不存在");
 		}
+		TeachInfo teachInfoCondition=new TeachInfo();
+		teachInfoCondition.setTeachId(teachId);
+		RelOrgTeach relOrgTeachCondition=new RelOrgTeach();
+		relOrgTeachCondition.setTeachId(teachId);
+		//结果返回
+		JSONObject result=new JSONObject();
+		result.put("teachInfo",teachInfoService.getOne(Condition.getQueryWrapper(teachInfoCondition)));
+		result.put("teachAccount",teachAccountService.getOne(Condition.getQueryWrapper(teachAccountCondition)));
+		result.put("relOrgTeach",relOrgTeachService.list(Condition.getQueryWrapper(relOrgTeachCondition)));
+		return R.data(result);
 	}
 
 	/**
@@ -459,8 +460,8 @@ public class TeachInfoController extends BladeController {
 //	@Role(include = {RoleCode.TEACH})
 	@ApiOperationSupport(order = 2)
 	@ApiOperation(value="",notes="传入teachId,teachAccount,teachInfo")
-	@PostMapping("/changeTeachByTeachAccount")
-	public R changeTeachByTeachAccount(@Valid @RequestBody String Params){
+	@PostMapping("/changeTeachByTeachId")
+	public R changeTeachByTeachId(@Valid @RequestBody String Params){
 		//根据teachAccount找到teachId
 		System.out.println("请求体内容:\n"+ Params);
 
@@ -504,7 +505,7 @@ public class TeachInfoController extends BladeController {
 		teachIn.setCertificateNum(tfobj.getString("certificateNum"));
 		teachIn.setProfessionalTitle(tfobj.getString("professionTitle"));
 		teachIn.setCountryNature(tfobj.getString("countryNature"));
-		teachIn.setNationality(tfobj.getString("highestEducation"));
+		teachIn.setNationality(tfobj.getString("nationality"));
 		teachIn.setHighestEducation(tfobj.getString("highestEducation"));
 		teachIn.setEducationalInstitution(tfobj.getString("educationalInstitution"));
 		teachIn.setHighestDegree(tfobj.getString("highestDegree"));

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.springblade.demo.mapper.NoticeMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="noticeResultMap" type="org.springblade.demo.entity.Notice">
+        <id column="notice_id" property="noticeId"/>
+        <result column="title" property="title"/>
+        <result column="content" property="content"/>
+        <result column="time" property="time"/>
+        <result column="publisher" property="publisher"/>
+    </resultMap>
+
+
+    <select id="selectNoticePage" resultMap="noticeResultMap">
+        select * from notice where is_deleted = 0
+    </select>
+
+</mapper>

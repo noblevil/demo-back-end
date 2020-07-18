@@ -41,7 +41,7 @@ public class LoginController {
 	@JwtIgnore
 	@PostMapping("/userLogin")
 	@ApiOperationSupport(order = 1)
-	@ApiOperation(value = "根据机构id获取机构信息详情", notes = "传入机构id")
+	@ApiOperation(value = "用户登录", notes = "账号account、密码password、角色role")
 	public R<String> userLogin(@Valid @RequestBody JSONObject object) {
 		String role=object.getString("role");
 		String account=object.getString("account");

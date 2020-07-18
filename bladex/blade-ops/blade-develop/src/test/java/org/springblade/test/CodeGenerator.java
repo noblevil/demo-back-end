@@ -29,15 +29,15 @@ public class CodeGenerator {
 	/**
 	 * 代码生成的模块名
 	 */
-	public static String CODE_NAME = "资源管理";
+	public static String CODE_NAME = "通知信息管理";
 	/**
 	 * 代码所在服务名
 	 */
-	public static String SERVICE_NAME = "blade-develop";
+	public static String SERVICE_NAME = "blade-demo";
 	/**
 	 * 代码生成的包名
 	 */
-	public static String PACKAGE_NAME = "org.springblade.develop";
+	public static String PACKAGE_NAME = "org.springblade.demo";
 	/**
 	 * 前端代码生成所属系统
 	 */
@@ -49,11 +49,11 @@ public class CodeGenerator {
 	/**
 	 * 需要去掉的表前缀
 	 */
-	public static String[] TABLE_PREFIX = {"blade_"};
+	public static String[] TABLE_PREFIX = {};
 	/**
 	 * 需要生成的表名(两者只能取其一)
 	 */
-	public static String[] INCLUDE_TABLES = {"blade_datasource"};
+	public static String[] INCLUDE_TABLES = {"notice"};
 	/**
 	 * 需要排除的表名(两者只能取其一)
 	 */
@@ -61,11 +61,11 @@ public class CodeGenerator {
 	/**
 	 * 是否包含基础业务字段
 	 */
-	public static Boolean HAS_SUPER_ENTITY = Boolean.TRUE;
+	public static Boolean HAS_SUPER_ENTITY = Boolean.FALSE;
 	/**
 	 * 基础业务字段
 	 */
-	public static String[] SUPER_ENTITY_COLUMNS = {"id", "create_time", "create_user", "create_dept", "update_time", "update_user", "status", "is_deleted"};
+	public static String[] SUPER_ENTITY_COLUMNS = {};
 
 
 	/**

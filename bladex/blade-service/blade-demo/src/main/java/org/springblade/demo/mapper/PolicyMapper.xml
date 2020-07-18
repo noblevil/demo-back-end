@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.springblade.demo.mapper.PolicyMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="policyResultMap" type="org.springblade.demo.entity.Policy">
+        <id column="policy_id" property="policyId"/>
+        <result column="title" property="title"/>
+        <result column="content" property="content"/>
+        <result column="time" property="time"/>
+        <result column="publisher" property="publisher"/>
+    </resultMap>
+
+
+    <select id="selectPolicyPage" resultMap="policyResultMap">
+        select * from policy where is_deleted = 0
+    </select>
+
+</mapper>
