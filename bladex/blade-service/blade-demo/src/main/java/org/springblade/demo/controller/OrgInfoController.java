@@ -16,6 +16,7 @@
  */
 package org.springblade.demo.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.xiaoymin.knife4j.annotations.ApiOperationSupport;
@@ -336,6 +337,47 @@ public class OrgInfoController extends BladeController {
 		return R.status(orgInfoService.updateById(orgInfo));
 	}
 
+	/**
+	 * ybj 7.18
+	 * http://localhost:9101/orginfo/insertOrgInfo?  (Requestbody请求体传入字段信息)
+	 * 注册机构信息，包括orgAccount,orgInfo,orgQualifData信息
+	 * @param Params
+	 * @return
+	 */
+	@JwtIgnore
+//	@Role(include = {RoleCode.ORG})
+	@ApiOperationSupport(order = 4)
+	@ApiOperation(value="注册机构信息",notes="传入orgAccount,orgInfo,orgQualifData信息")
+	@PostMapping("/insertOrgInfo")
+	public R insertOrgInfo(@Valid @RequestBody String Params) {
+		System.out.println("请求体内容\n" + Params);
+		JSONObject obj = JSON.parseObject(Params);
+
+		//嵌套JSONObject分割处理
+		JSONObject ifobj = (JSONObject) obj.get("orgInfo");
+		JSONObject acobj = (JSONObject) obj.get("orgAccountInfo");
+		JSONObject qaobj = (JSONObject) obj.get("orgQualifInfo");
+
+		OrgInfo orginfo = new OrgInfo();
+		OrgAccount orgAccount = new OrgAccount();
+		OrgQualifData orgQualifData = new OrgQualifData();
+
+		//JSONObject对象转实体类orginfo,orgAccount,orgQualifDate
+		orginfo = (OrgInfo) ifobj.toJavaObject(ifobj, OrgInfo.class);
+		orgAccount = (OrgAccount) acobj.toJavaObject(acobj, OrgAccount.class);
+		orgQualifData = (OrgQualifData) qaobj.toJavaObject(qaobj, OrgQualifData.class);
+
+		//首先新增机构账号
+		orgAccountService.save(orgAccount);
+		//获取新增机构id
+		int orgId;
+		orgId = orgAccount.getOrgId();
+		//设置org_id
+		orginfo.setOrgId(orgId);
+		orgQualifData.setOrgId(orgId);
+		//新增orginfo,orgQualifData记录
+		return R.status(orgInfoService.save(orginfo) && orgQualifDataService.save(orgQualifData));
+	}
 	//===========================以下为自动生成的接口==============================
 
 	/**

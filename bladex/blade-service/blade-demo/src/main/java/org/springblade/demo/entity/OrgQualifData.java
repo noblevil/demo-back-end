@@ -39,7 +39,7 @@ public class OrgQualifData implements Serializable {
 	* 机构ID 机构标识符
 	*/
 		@ApiModelProperty(value = "机构ID 机构标识符")
-
+		@TableId(value = "org_id")
 		private Integer orgId;
 	/**
 	* 法人姓名

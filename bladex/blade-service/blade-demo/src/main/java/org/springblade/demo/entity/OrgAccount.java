@@ -16,6 +16,7 @@
  */
 package org.springblade.demo.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -40,7 +41,7 @@ public class OrgAccount implements Serializable {
 	* 机构ID
 	*/
 		@ApiModelProperty(value = "机构ID")
-		@TableId(value = "org_id")
+		@TableId(value = "org_id",type = IdType.AUTO)
 		private Integer orgId;
 	/**
 	* 机构账号名
